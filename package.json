@@ -5,7 +5,8 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "./node_modules/coffee-script/bin/coffee --watch --compile --output lib src"
+    "compile": "./node_modules/coffee-script/bin/coffee --watch --compile --output lib src",
+    "start": "node lib/index.js"
   },
   "repository": {
     "type": "git",
