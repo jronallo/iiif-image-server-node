@@ -1,6 +1,6 @@
 
 $(document).ready(function() {
-  var image_id, location, osd_config, viewer, qd;
+  var image_id, location, osd_config, viewer, qd={};
   window.location.search.substr(1).split("&").forEach(function(item) {
       var s = item.split("="),
           k = s[0],
