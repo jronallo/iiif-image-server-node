@@ -9,4 +9,4 @@ npm i
 npm start
 ```
 
-In your browser visit <http://localhost:3000/trumpler14/full/400,/0/default.jpg>
+In your browser visit <http://localhost:3000/index.html?id=trumpler14>
