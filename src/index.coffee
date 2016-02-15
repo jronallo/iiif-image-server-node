@@ -15,6 +15,44 @@ cache = require('memory-cache')
 resolve_image_path = (id) ->
   path.join __dirname, "/../images/#{id}.jp2"
 
+image_extraction = (res, url) ->
+  # First we parse the URL to extract all the information we'll need from the
+  # request to choose the correct image, extract information from it, and
+  # create the requested image.
+  parser = new Parser url
+  params = parser.parse()
+  image_path = resolve_image_path(params.identifier)
+
+  # Usually you'd want to do some image information caching, but in this case
+  # we'll just look up the information every request.
+
+  # This will be the last method called once the extractor has created the
+  # image to return.
+  extractor_cb = (output_image_path) ->
+    # TODO: add simple image caching at least in some cases
+    cache.put url, output_image_path
+    res.sendFile output_image_path
+
+  # Once the informer finishes its work it calls this callback with the information.
+  # The extractor then uses it to create the image.
+  info_cb = (info) ->
+    if !cache.get(params.identifier)
+      cache.put params.identifier, info
+    options =
+      path: image_path
+      params: params # from IIIFImageRequestParser
+      info: info
+    extractor = new Extractor options, extractor_cb
+    extractor.extract()
+
+  # The informer runs first unless the info is in the cache
+  cache_info = cache.get params.identifier
+  if cache_info
+    info_cb(_.cloneDeep cache_info)
+  else
+    informer = new Informer image_path, info_cb
+    informer.inform()
+
 # Serve a web page for an openseadragon viewer.
 # http://localhost:3000/index.html?id=trumpler14
 app.get '/index.html', (req, res) ->
@@ -65,46 +103,22 @@ app.get '*info.json', (req, res) ->
 # This image server will only accept requests for jpg and png images.
 app.get '*.(jpg|png)', (req, res) ->
   url = req.url
-
-  # First we parse the URL to extract all the information we'll need from the
-  # request to choose the correct image, extract information from it, and
-  # create the requested image.
-  parser = new Parser url
-  params = parser.parse()
-
-  image_path = resolve_image_path(params.identifier)
-
-  # Usually you'd want to do some image information caching, but in this case
-  # we'll just look up the information every request.
-
-  # This will be the last method called once the extractor has created the
-  # image to return.
-  extractor_cb = (output_image_path) ->
-    # TODO: add simple image caching at least in some cases
-    res.sendFile output_image_path, ->
-      # TODO: Do not always clean up
-      fs.unlink output_image_path
-
-
-  # Once the informer finishes its work it calls this callback with the information.
-  # The extractor then uses it to create the image.
-  info_cb = (info) ->
-    if !cache.get(params.identifier)
-      cache.put params.identifier, info
-    options =
-      path: image_path
-      params: params # from IIIFImageRequestParser
-      info: info
-    extractor = new Extractor options, extractor_cb
-    extractor.extract()
-
-  # The informer runs first unless the info is in the cache
-  cache_info = cache.get params.identifier
-  if cache_info
-    info_cb(_.cloneDeep cache_info)
+  cache_image_path = cache.get url
+  # If the image is cached try to serve the cached image
+  if cache_image_path
+    # Check to see if the image exists
+    fs.stat cache_image_path, (err, stats) ->
+      # If there is an error delete the key from the cache, and
+      # just run the image extraction like normal. Pass the response in
+      # with the url which is all that is needed to respond.
+      if err
+        cache.del url
+        image_extraction(res, url)
+      else
+        # A good cache hit so we serve the cached image.
+        res.sendFile cache_image_path
   else
-    informer = new Informer image_path, info_cb
-    informer.inform()
+    image_extraction(res, url)
 
 # Catch all route
 app.get '*', (req, res) ->
