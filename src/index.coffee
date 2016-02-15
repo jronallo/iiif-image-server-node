@@ -2,6 +2,7 @@ express = require('express')
 app = express()
 _ = require 'lodash'
 path = require 'path'
+fs = require 'fs'
 iiif = require 'iiif-image'
 Informer = iiif.IIIFImageInformer
 Extractor = iiif.IIIFImageExtractor
@@ -79,7 +80,11 @@ app.get '*.(jpg|png)', (req, res) ->
   # This will be the last method called once the extractor has created the
   # image to return.
   extractor_cb = (output_image_path) ->
-    res.sendFile output_image_path
+    # TODO: add simple image caching at least in some cases
+    res.sendFile output_image_path, ->
+      # TODO: Do not always clean up
+      fs.unlink output_image_path
+
 
   # Once the informer finishes its work it calls this callback with the information.
   # The extractor then uses it to create the image.
