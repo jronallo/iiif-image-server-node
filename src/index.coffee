@@ -10,7 +10,7 @@ Parser = iiif.IIIFImageRequestParser
 app.get '*', (req, res) ->
   url = req.url
   if _.includes(url, 'info.json')
-    res.send('info.json')
+    res.send('Still need to implement the proper response to an information request. Most of the data ought to be found in the results of an IIIFImageInformer.')
   else
     # First we parse the URL to extract all the information we'll need from the
     # request to choose the correct image, extract information from it, and
