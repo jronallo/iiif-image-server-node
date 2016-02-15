@@ -8,8 +8,23 @@ Extractor = iiif.IIIFImageExtractor
 Parser = iiif.IIIFImageRequestParser
 InfoJSONCreator = iiif.IIIFInfoJSONCreator
 
+# serve a web page for an openseadragon viewer.
+# http://localhost:3000/index.html?id=trumpler14
 app.get '/index.html', (req, res) ->
-  res.send('This ought to deliver a pan-zoom viewer or something.')
+  index = path.join __dirname, "/../app/index.html"
+  res.sendFile(index)
+
+app.get '/openseadragon.js', (req, res) ->
+  osdjs = path.join __dirname, '/../node_modules/openseadragon/build/openseadragon/openseadragon.js'
+  res.sendFile(osdjs)
+
+app.get '/openseadragon/images/:image', (req, res) ->
+  osdf = path.join __dirname, "/../node_modules/openseadragon/build/openseadragon/images/#{req.params.image}"
+  res.sendFile osdf
+
+app.get '/openseadragon-start.js', (req, res) ->
+  osds = path.join __dirname, "/../app/openseadragon-start.js"
+  res.sendFile(osds)
 
 app.get '*info.json', (req, res) ->
   url = req.url
@@ -36,11 +51,10 @@ app.get '*.(jpg|png)', (req, res) ->
   # create the requested image.
   parser = new Parser url
   params = parser.parse()
-  console.log params
+  # console.log params
 
   # Here's the simplest resolver ever:
   image_path = path.join __dirname, "/../images/#{params.identifier}.jp2"
-  console.log image_path
 
   # Usually you'd want to do some image information caching, but in this case
   # we'll just look up the information every request.

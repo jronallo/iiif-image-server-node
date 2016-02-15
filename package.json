@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "express": "^4.13.4",
-    "lodash": "^4.3.0"
+    "lodash": "^4.3.0",
+    "openseadragon": "^2.1.0"
   }
 }
