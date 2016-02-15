@@ -6,12 +6,26 @@ iiif = require 'iiif-image'
 Informer = iiif.IIIFImageInformer
 Extractor = iiif.IIIFImageExtractor
 Parser = iiif.IIIFImageRequestParser
+InfoJSONCreator = iiif.IIIFInfoJSONCreator
 
 app.get '/index.html', (req, res) ->
   res.send('This ought to deliver a pan-zoom viewer or something.')
 
 app.get '*info.json', (req, res) ->
-  res.send('Still need to implement the proper response to an information request. Most of the data ought to be found in the results of an IIIFImageInformer.')
+  url = req.url
+  url_parts = url.split('/')
+  id = url_parts[url_parts.length - 2]
+  image_path = path.join __dirname, "/../images/#{id}.jp2"
+
+  scheme = if req.connection.encrypted? then 'https' else 'http'
+  server_info =
+    id: "#{scheme}://#{req.headers.host}/#{id}"
+    level: 1
+  info_cb = (info) ->
+    info_json_creator = new InfoJSONCreator info, server_info
+    res.send info_json_creator.info_json
+  informer = new Informer image_path, info_cb
+  informer.inform(info_cb)
 
 # This image server will only accept requests for jpg and png images.
 app.get '*.(jpg|png)', (req, res) ->
