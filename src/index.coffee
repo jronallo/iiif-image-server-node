@@ -8,6 +8,8 @@ Extractor = iiif.IIIFImageExtractor
 Parser = iiif.IIIFImageRequestParser
 InfoJSONCreator = iiif.IIIFInfoJSONCreator
 
+cache = require('memory-cache')
+
 # Simple file resolver
 resolve_image_path = (id) ->
   path.join __dirname, "/../images/#{id}.jp2"
@@ -44,11 +46,19 @@ app.get '*info.json', (req, res) ->
   server_info =
     id: "#{scheme}://#{req.headers.host}/#{id}"
     level: 1
+
   info_cb = (info) ->
+    if !cache.get(id)
+      cache.put id, info
     info_json_creator = new InfoJSONCreator info, server_info
     res.send info_json_creator.info_json
-  informer = new Informer image_path, info_cb
-  informer.inform(info_cb)
+
+  cache_info = cache.get id
+  if cache_info
+    info_cb(_.cloneDeep cache_info)
+  else
+    informer = new Informer image_path, info_cb
+    informer.inform()
 
 # The actual image server.``
 # This image server will only accept requests for jpg and png images.
@@ -74,6 +84,8 @@ app.get '*.(jpg|png)', (req, res) ->
   # Once the informer finishes its work it calls this callback with the information.
   # The extractor then uses it to create the image.
   info_cb = (info) ->
+    if !cache.get(params.identifier)
+      cache.put params.identifier, info
     options =
       path: image_path
       params: params # from IIIFImageRequestParser
@@ -81,9 +93,13 @@ app.get '*.(jpg|png)', (req, res) ->
     extractor = new Extractor options, extractor_cb
     extractor.extract()
 
-  # The informer runs first
-  informer = new Informer image_path, info_cb
-  informer.inform(info_cb)
+  # The informer runs first unless the info is in the cache
+  cache_info = cache.get params.identifier
+  if cache_info
+    info_cb(_.cloneDeep cache_info)
+  else
+    informer = new Informer image_path, info_cb
+    informer.inform()
 
 # Catch all route
 app.get '*', (req, res) ->
