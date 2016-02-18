@@ -5,13 +5,18 @@ app = express()
 _ = require 'lodash'
 path = require 'path'
 fs = require 'fs'
-tempfile = require 'tempfile'
+
 # All the IIIF tools
 iiif = require 'iiif-image'
 Informer = iiif.Informer
 Extractor = iiif.Extractor
 Parser = iiif.ImageRequestParser
 InfoJSONCreator = iiif.InfoJSONCreator
+Validator = iiif.Validator
+
+# image server functions
+image_extraction = require('./image-extraction').image_extraction
+resolve_image_path = require('./resolver').resolve_image_path
 
 ###
 We'll create two different memory caches. One will keep image information
@@ -24,66 +29,6 @@ image_cache = new NodeCache stdTTL: 86400, checkperiod: 3600
 image_cache.on 'del', (key, cached_image_path) ->
   console.log "Image deleted: #{key} #{cached_image_path}"
   fs.unlink cached_image_path
-
-###
-Simple file resolver!
-This could be changed to find images split across directories based on the id
-or look up the path to the image in a database. In this case we know all the
-images are going to be JP2s.
-###
-resolve_image_path = (id) ->
-  path.join __dirname, "/../images/#{id}.jp2"
-
-###
-This function needs the response object and the incoming URL to parse the URL,
-get information about the image, extract the requested image, and provide a
-response to the client.
-###
-image_extraction = (res, url, params) ->
-
-  image_path = resolve_image_path(params.identifier)
-
-  # This will be the last callback called once the extractor has created the
-  # image to return.
-  extractor_cb = (image) ->
-    # TODO: better mimetype handling for more formats
-    image_type = if params.format == 'png' then 'image/png' else 'image/jpeg'
-    res.setHeader 'Content-Type', image_type
-    # TODO: If a String is returned then sendFile else return the buffer
-    # Return the buffer sharp creates which means it does not have to be read
-    # off the file system.
-    res.send image
-    # After we send the image we can cache it for a time.
-    # TODO: We should cache scheme/protocol-relative URLs if the image server
-    # can be used under both HTTP and HTTPS.
-    if !image_cache.get url
-      image_path = tempfile(".#{params.format}")
-      fs.writeFile image_path, image, (err) ->
-        image_cache.set url, image_path
-
-  # Once the informer finishes its work it calls this callback with the information.
-  # The extractor then uses the information to create the image.
-  info_cb = (info) ->
-    # First if the information we get back is not already in the information
-    # cache we add it there.
-    if !info_cache.get(params.identifier)
-      info_cache.set params.identifier, info
-    # We create the options that the Extractor expects
-    options =
-      path: image_path
-      params: params # from ImageRequestParser
-      info: info
-    extractor = new Extractor options, extractor_cb
-    extractor.extract()
-
-  # If the information for the image is in the cache then we do not run the
-  # informer and just skip right to the doing something with the information.
-  cache_info = info_cache.get params.identifier
-  if cache_info
-    info_cb(_.cloneDeep cache_info)
-  else
-    informer = new Informer image_path, info_cb
-    informer.inform()
 
 # Serve a web page for an openseadragon viewer.
 # http://localhost:3000/index.html?id=trumpler14
@@ -159,27 +104,32 @@ app.get '*.(jpg|png)', (req, res) ->
       # with the url which is all that is needed to respond.
       if err
         image_cache.del url
-        image_extraction(res, url, params)
+        # If the file does not exist we extract the image again.
+        image_extraction(res, url, params, info_cache, image_cache)
       else
         # A good cache hit so we serve the cached image.
         res.sendFile cache_image_path
   else # If the image is not cached run the extraction.
 
     ###
-    TODO: Valid request format?
-    Here we can do a quick check whether the format of the request is valid
-    before trying the extraction. The check here would not be able to check
+    We do a quick check whether the parameters of the request are valid
+    before trying the extraction. The check here is not able to check
     whether the request is completely valid because we do not have the image
-    information yet. In cases where we do have the image information from the
-    cache we could do a fuller validation of the request (does it result in
+    information yet.
+    TODO: In cases where we do have the image information from the
+    info_cache we could do a fuller validation of the request (does it result in
     a 0 pixel image? Is the request out of bounds of the image?).
     ###
-
-    image_extraction(res, url, params)
+    validator = new Validator params
+    if validator.valid_params()
+      # This is where most of the work happens:
+      image_extraction(res, url, params, info_cache, image_cache)
+    else
+      res.status(400).send('400 error')
 
 # TODO: Catch all route that probably ought to return a response code.
 app.get '*', (req, res) ->
-  res.send('This route catches anything else that does not match.')
+  res.status(404).send('404 not found')
 
 app.listen 3000, () ->
   console.log('Example IIIF image server listening on port 3000! Visit http://localhost:3000/index.html?id=trumpler14')
