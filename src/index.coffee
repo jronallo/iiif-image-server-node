@@ -10,7 +10,15 @@ Parser = iiif.ImageRequestParser
 InfoJSONCreator = iiif.InfoJSONCreator
 tempfile = require 'tempfile'
 
-cache = require('memory-cache')
+# We'll create two different memory caches. One will be to keep image information
+# for the life of the process and the other will be to cache images to the file
+# system for a specified amount of time.
+NodeCache = require('node-cache')
+info_cache = new NodeCache()
+image_cache = new NodeCache stdTTL: 86400, checkperiod: 3600
+image_cache.on 'del', (key, cached_image_path) ->
+  console.log "Image deleted: #{key} #{cached_image_path}"
+  fs.unlink cached_image_path
 
 # Simple file resolver
 resolve_image_path = (id) ->
@@ -38,16 +46,16 @@ image_extraction = (res, url) ->
     # off the file system.
     res.send image
     # After we send the image we can cache it
-    if !cache.get url
+    if !image_cache.get url
       image_path = tempfile(".#{params.format}")
       fs.writeFile image_path, image, (err) ->
-        cache.put url, image_path
+        image_cache.set url, image_path
 
   # Once the informer finishes its work it calls this callback with the information.
   # The extractor then uses it to create the image.
   info_cb = (info) ->
-    if !cache.get(params.identifier)
-      cache.put params.identifier, info
+    if !info_cache.get(params.identifier)
+      info_cache.set params.identifier, info
     options =
       path: image_path
       params: params # from ImageRequestParser
@@ -56,7 +64,7 @@ image_extraction = (res, url) ->
     extractor.extract()
 
   # The informer runs first unless the info is in the cache
-  cache_info = cache.get params.identifier
+  cache_info = info_cache.get params.identifier
   if cache_info
     info_cb(_.cloneDeep cache_info)
   else
@@ -97,12 +105,12 @@ app.get '*info.json', (req, res) ->
     level: 1
 
   info_cb = (info) ->
-    if !cache.get(id)
-      cache.put id, info
+    if !info_cache.get(id)
+      info_cache.set id, info
     info_json_creator = new InfoJSONCreator info, server_info
     res.send info_json_creator.info_json
 
-  cache_info = cache.get id
+  cache_info = info_cache.get id
   if cache_info
     info_cb(_.cloneDeep cache_info)
   else
@@ -113,7 +121,7 @@ app.get '*info.json', (req, res) ->
 # This image server will only accept requests for jpg and png images.
 app.get '*.(jpg|png)', (req, res) ->
   url = req.url
-  cache_image_path = cache.get url
+  cache_image_path = image_cache.get url
   # If the image is cached try to serve the cached image
   if cache_image_path
     # Check to see if the image exists
@@ -122,7 +130,7 @@ app.get '*.(jpg|png)', (req, res) ->
       # just run the image extraction like normal. Pass the response in
       # with the url which is all that is needed to respond.
       if err
-        cache.del url
+        image_cache.del url
         image_extraction(res, url)
       else
         # A good cache hit so we serve the cached image.
