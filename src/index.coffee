@@ -4,10 +4,11 @@ _ = require 'lodash'
 path = require 'path'
 fs = require 'fs'
 iiif = require 'iiif-image'
-Informer = iiif.IIIFImageInformer
-Extractor = iiif.IIIFImageExtractor
-Parser = iiif.IIIFImageRequestParser
-InfoJSONCreator = iiif.IIIFInfoJSONCreator
+Informer = iiif.Informer
+Extractor = iiif.Extractor
+Parser = iiif.ImageRequestParser
+InfoJSONCreator = iiif.InfoJSONCreator
+tempfile = require 'tempfile'
 
 cache = require('memory-cache')
 
@@ -28,10 +29,19 @@ image_extraction = (res, url) ->
 
   # This will be the last method called once the extractor has created the
   # image to return.
-  extractor_cb = (output_image_path) ->
-    # TODO: add simple image caching at least in some cases
-    cache.put url, output_image_path
-    res.sendFile output_image_path
+  extractor_cb = (image) ->
+    # TODO: better mimetype handling for more formats
+    image_type = if @params.format == 'png' then 'image/png' else 'image/jpeg'
+    res.setHeader 'Content-Type', image_type
+    # TODO: If a String is returned then sendFile else return the buffer
+    # Return the buffer sharp creates which means it does not have to be read
+    # off the file system.
+    res.send image
+    # After we send the image we can cache it
+    if !cache.get url
+      image_path = tempfile(".#{params.format}")
+      fs.writeFile image_path, image, (err) ->
+        cache.put url, image_path
 
   # Once the informer finishes its work it calls this callback with the information.
   # The extractor then uses it to create the image.
@@ -40,7 +50,7 @@ image_extraction = (res, url) ->
       cache.put params.identifier, info
     options =
       path: image_path
-      params: params # from IIIFImageRequestParser
+      params: params # from ImageRequestParser
       info: info
     extractor = new Extractor options, extractor_cb
     extractor.extract()

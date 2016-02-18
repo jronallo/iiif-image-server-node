@@ -9,6 +9,7 @@ $(document).ready(function() {
   });
 
   image_id = qd.id[0]
+  console.log(image_id);
   // location.query.id;
   console.log(image_id);
   osd_config = {
