@@ -3,3 +3,4 @@ npm-debug*
 .bundle
 .vagrant
 images/seg*
+scripts
