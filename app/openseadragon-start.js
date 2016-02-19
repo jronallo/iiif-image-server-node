@@ -28,7 +28,8 @@ $(document).ready(function() {
     ],
     tileSources: []
   };
-  osd_config['tileSources'].push("http://localhost:3000/" + (encodeURIComponent(image_id)) + "/info.json");
-  console.log(osd_config);
+  server_url = window.location.protocol+'//'+window.location.hostname+(window.location.port ? ':'+window.location.port: '');
+  full_url = server_url +'/'+ (encodeURIComponent(image_id)) + "/info.json";
+  osd_config['tileSources'].push(full_url);
   return viewer = OpenSeadragon(osd_config);
 });

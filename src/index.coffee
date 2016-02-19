@@ -140,6 +140,5 @@ app.get '*.(jpg|png)', (req, res) ->
 app.get '*', (req, res) ->
   res.status(404).send('404 not found')
 
-if require.main == module # for testing
-  app.listen 3000, () ->
-    console.log('Example IIIF image server listening on port 3000! Visit http://localhost:3000/index.html?id=trumpler14')
+app.listen 3000, () ->
+  console.log('Example IIIF image server listening on port 3000! Visit http://localhost:3000/index.html?id=trumpler14')

@@ -1,0 +1,38 @@
+---
+- hosts: iiif-image-server
+  become: yes
+  become_method: sudo
+  become_user: root
+  remote_user: root
+  gather_facts: yes
+  vars:
+    project_name: iiif-image-server
+  roles:
+    - role: passenger-nginx
+  post_tasks:
+    - name: zip/unzip (for later kdu install)
+      yum:
+        pkg: "{{item}}"
+        state: present
+        update_cache: yes
+      with_items:
+        - unzip
+    - name: mkdir ~/.npm-global
+      become: no
+      file: path=~/.npm-global state=directory
+    - name: npm config set prefix
+      become: no
+      shell: npm config set prefix '~/.npm-global'
+    - name: update profile
+      become: no
+      lineinfile:
+        dest: ~/.bash_profile
+        line: export PATH=~/.npm-global/bin:$PATH
+    - name: npm install
+      become: no
+      shell: chdir=/iiif-image-server npm i
+    - name: restart nginx
+      service: name=nginx state=restarted
+    - name: install nodemon
+      become: no
+      shell: npm i -g nodemon
