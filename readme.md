@@ -19,7 +19,7 @@ In another terminal run `nodemon` to restart the server on changes.
 
 ## Vagrant
 
-Currently dependencies are installed with ansible roles from a private repository. These roles install nodejs and passenger. We're working to make this repository public.
+Currently dependencies are installed with ansible roles from a private repository. These roles install nodejs and passenger. We're working to make this repository public. You'll also need to install the Kakadu executables, which we do not distribute.
 
 Once everything is installed you can visit: <http://localhost:8088/index.html?id=trumpler14>
 
