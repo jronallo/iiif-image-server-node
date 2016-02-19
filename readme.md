@@ -4,6 +4,8 @@ Simple example IIIF Image server written in Node to show the use of the `iiif-im
 
 ## Usage
 
+You'll need to use `npm link iiif-image` until the `iiif-image` module is published to npm.
+
 ```sh
 npm i
 npm start
