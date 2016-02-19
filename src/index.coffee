@@ -59,6 +59,10 @@ app.get '*info.json', (req, res) ->
   id = url_parts[url_parts.length - 2]
   image_path = resolve_image_path(id)
 
+  ###
+  Check to see if the image exists. If not return a 404. If the image exists
+  return the information about the image.
+  ###
   fs.stat image_path, (err, stats) ->
     if err
       res.state(404).send('404')
@@ -99,6 +103,10 @@ app.get '*.(jpg|png)', (req, res) ->
   params = parser.parse()
   image_path = resolve_image_path(params.identifier)
 
+  ###
+  Check to see if the image exists. If not return a 404. If the image exists
+  return the information about the image.
+  ###
   fs.stat image_path, (err, stats) ->
     if err
       res.status(404).send('404')
