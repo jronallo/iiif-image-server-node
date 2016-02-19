@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/jronallo/iiif-image-server-node.git"
+    "url": "git@github.com:jronallo/iiif-image-server-node.git"
   },
   "keywords": [
     "iiif"
   ],
   "author": "Jason Ronallo <jronallo@gmail.com> (http://ronallo.com)",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/jronallo/iiif-image-server-node#readme",
+  "homepage": "https://github.com/jronallo/iiif-image-server-node",
   "devDependencies": {
     "coffee-script": "^1.10.0"
   },
