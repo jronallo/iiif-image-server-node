@@ -2,6 +2,8 @@ resolve_image_path = require('./resolver').resolve_image_path
 _ = require 'lodash'
 tempfile = require 'tempfile'
 fs = require 'fs'
+mkdirp = require 'mkdirp'
+path = require 'path'
 
 # configuration from the config directory
 config = require 'config'
@@ -11,8 +13,7 @@ iiif = require 'iiif-image'
 Informer = iiif.Informer(jp2_binary)
 Extractor = iiif.Extractor(jp2_binary)
 Validator = iiif.Validator
-slugify_path = require './slugify-path'
-path_for_image_temp_file = require './path-for-image-temp-file'
+path_for_image_cache_file = require './path-for-image-cache-file'
 
 ###
 This function needs the response object and the incoming URL to parse the URL,
@@ -38,9 +39,14 @@ image_extraction = (res, url, params, info_cache, image_cache) ->
     res.send image
     # After we send the image we can cache it for a time.
     if !image_cache.get url
-      image_path = path_for_image_temp_file slugify_path url
-      fs.writeFile image_path, image, (err) ->
-        image_cache.set url, image_path
+      image_path = path_for_image_cache_file url
+      dirname = path.dirname image_path
+      mkdirp dirname, (err, made) ->
+        if !err
+          fs.writeFile image_path, image, (err) ->
+            if !err
+              image_cache.set url, image_path
+              console.log "cached: #{image_path}"
 
   ###
   Once the informer finishes its work it calls this callback sending it the

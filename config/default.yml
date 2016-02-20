@@ -4,3 +4,21 @@
 # opj => OpenJPEG => opj_dump and opj_decompress
 
 jp2_binary: 'opj'
+cache:
+  image:
+    ttl: 86400
+    checkperiod: 3600
+
+    # Options for base_path are:
+    # tmpdir: Use the system temporary directory
+    # public: Use the project's public directory. This can be useful for allowing
+    #         the web server, say behind Passenger, to serve up the image files
+    #         directly.
+    # Any other string will be treated like the
+    base_path: 'public'
+
+resolver:
+  # Source image resolver. If the base_path is falsey then the images directory
+  # in this project will be used. Any other value ought to be the full base
+  # path for resolving images.
+  base_path: false

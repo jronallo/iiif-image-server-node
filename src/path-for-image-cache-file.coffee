@@ -9,8 +9,16 @@ caching solution won't work for every image server.
 
 path = require 'path'
 os = require 'os'
+config = require 'config'
 
-path_for_image_temp_file = (filename) ->
-  path.join os.tmpdir(), filename
+path_for_image_cache_file = (filepath) ->
+  base_path = config.get('cache.image.base_path')
+  base_path = if base_path == 'tmpdir'
+    os.tmpdir()
+  else if base_path == 'public'
+    path.join __dirname, '/../public'
+  else
+    base_path
+  path.join base_path, filepath
 
-module.exports = path_for_image_temp_file
+module.exports = path_for_image_cache_file

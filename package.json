@@ -28,6 +28,7 @@
     "iiif-image": "0.0.3",
     "js-yaml": "^3.5.3",
     "lodash": "^4.3.0",
+    "mkdirp": "^0.5.1",
     "node-cache": "^3.1.0",
     "openseadragon": "^2.1.0",
     "tempfile": "^1.1.1"

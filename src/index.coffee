@@ -20,8 +20,7 @@ Validator = iiif.Validator
 # Image server specific functions
 image_extraction = require('./image-extraction').image_extraction
 resolve_image_path = require('./resolver').resolve_image_path
-slugify_path = require './slugify-path'
-path_for_image_temp_file = require './path-for-image-temp-file'
+path_for_image_cache_file = require './path-for-image-cache-file'
 
 ###
 Caching
@@ -43,14 +42,19 @@ the file system. This works fine for single process applications, but if you
 begin to scale out to multiple processes then you will want to use a shared
 cache like Memcached.
 ###
-ttl = 86400
-checkperiod = 3600
+ttl = config.get('cache.image.ttl')
+checkperiod = config.get('cache.image.checkperiod')
+console.log "Image cache: ttl:#{ttl} checkperiod:#{checkperiod}"
 image_cache = new NodeCache stdTTL: ttl, checkperiod: checkperiod
 image_cache.on 'del', (key, cached_image_path) ->
   console.log "Image deleted: #{key} #{cached_image_path}"
   fs.unlink cached_image_path, (err) ->
     # Do nothing since we have already achieved our goal to remove the file.
     return
+
+# Serve static cached images from the public directory.
+# See the config setting cache.image.base_path for more information.
+app.use(express.static('public'))
 
 # Serve a web page for an openseadragon viewer.
 # http://localhost:3000/index.html?id=trumpler14
@@ -124,14 +128,13 @@ app.get '*info.json', (req, res) ->
 app.get '*.:format(jpg|png)', (req, res) ->
   url = req.url
   ###
-  If the slugged image exists just serve that up. This allows cached images
+  If the image exists just serve that up. This allows cached images
   to be used across instances of the application, but will still not handle
   cache expiration in a unified way. This is why we check for the status of the
   file rather than relying on the memory cache to know whether this is an
   image_cache hit or not.
   ###
-  slug = slugify_path(url)
-  image_temp_file = path_for_image_temp_file(slug)
+  image_temp_file = path_for_image_cache_file(url)
   fs.stat image_temp_file, (err, stats) ->
     if !err
       console.log "cache image hit: #{url} #{image_temp_file}"
