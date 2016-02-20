@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "express": "^4.13.4",
-    "iiif-image": "0.0.1",
+    "iiif-image": "0.0.2",
     "lodash": "^4.3.0",
     "node-cache": "^3.1.0",
     "openseadragon": "^2.1.0",

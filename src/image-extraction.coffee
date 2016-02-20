@@ -3,8 +3,14 @@ _ = require 'lodash'
 tempfile = require 'tempfile'
 fs = require 'fs'
 iiif = require 'iiif-image'
-Informer = iiif.Informer
-Extractor = iiif.Extractor
+Informer = iiif.InformerJp2Openjpeg
+
+###
+Choose which extractor you want to use:
+opj => OpenJPEG => opj_decompress
+kdu => Kakadu => kdu_expand
+###
+Extractor = iiif.Extractor('opj')
 
 ###
 This function needs the response object and the incoming URL to parse the URL,

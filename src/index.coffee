@@ -8,8 +8,7 @@ fs = require 'fs'
 
 # All the IIIF tools
 iiif = require 'iiif-image'
-Informer = iiif.Informer
-Extractor = iiif.Extractor
+Informer = iiif.InformerJp2Openjpeg
 Parser = iiif.ImageRequestParser
 InfoJSONCreator = iiif.InfoJSONCreator
 Validator = iiif.Validator
