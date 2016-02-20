@@ -33,20 +33,19 @@ image_extraction = (res, url, params, info_cache, image_cache) ->
     # TODO: better mimetype handling for more formats
     image_type = if params.format == 'png' then 'image/png' else 'image/jpeg'
     res.setHeader 'Content-Type', image_type
-    # TODO: If a String is returned then sendFile else return the buffer
+
+    # TODO: If a String is returned then use sendFile else return the buffer.
     # Return the buffer sharp creates which means it does not have to be read
     # off the file system.
     res.send image
     # After we send the image we can cache it for a time.
-    # TODO: We should cache scheme/protocol-relative URLs if the image server
-    # can be used under both HTTP and HTTPS.
     if !image_cache.get url
       image_path = path_for_image_temp_file slugify_path url
       fs.writeFile image_path, image, (err) ->
         image_cache.set url, image_path
 
   ###
-  Once the informer finishes its work it calls this callback with the
+  Once the informer finishes its work it calls this callback sending it the
   information. Now that we have the info it checks to see if the request
   is valid. If it is valid then the extractor then uses the information to
   try to create the image. If the request is not valid then a 400 error is
@@ -63,7 +62,7 @@ image_extraction = (res, url, params, info_cache, image_cache) ->
       options =
         path: image_path
         params: params # from ImageRequestParser
-        info: info
+        info: info # from the Informer
 
       extractor = new Extractor options, extractor_cb
       extractor.extract()
@@ -78,6 +77,5 @@ image_extraction = (res, url, params, info_cache, image_cache) ->
   else
     informer = new Informer image_path, info_cb
     informer.inform()
-
 
 exports.image_extraction = image_extraction

@@ -1,4 +1,4 @@
-# The application frame work
+# The web application frame work
 express = require('express')
 app = express()
 # some libraries we need
@@ -6,20 +6,21 @@ _ = require 'lodash'
 path = require 'path'
 fs = require 'fs'
 
-# All the IIIF tools
+# All the IIIF tools we need here
 iiif = require 'iiif-image'
 Informer = iiif.InformerJp2Openjpeg
 Parser = iiif.ImageRequestParser
 InfoJSONCreator = iiif.InfoJSONCreator
 Validator = iiif.Validator
 
-# image server functions
+# Image server specific functions
 image_extraction = require('./image-extraction').image_extraction
 resolve_image_path = require('./resolver').resolve_image_path
 slugify_path = require './slugify-path'
 path_for_image_temp_file = require './path-for-image-temp-file'
 
 ###
+Caching
 We'll create two different memory caches. One will keep image information
 for the life of the process and the other will be to cache images to the file
 system for a specified amount of time.
@@ -33,7 +34,7 @@ or restarts.
 ###
 info_cache = new NodeCache()
 ###
-The image_cache is really only used for expiration of the image cache from
+The image_cache is really only used for expiration of an image from
 the file system. This works fine for single process applications, but if you
 begin to scale out to multiple processes then you will want to use a shared
 cache like Memcached.
@@ -44,7 +45,7 @@ image_cache = new NodeCache stdTTL: ttl, checkperiod: checkperiod
 image_cache.on 'del', (key, cached_image_path) ->
   console.log "Image deleted: #{key} #{cached_image_path}"
   fs.unlink cached_image_path, (err) ->
-    # do nothing
+    # Do nothing since we have already achieved our goal to remove the file.
     return
 
 # Serve a web page for an openseadragon viewer.
@@ -70,7 +71,13 @@ app.get '/openseadragon-start.js', (req, res) ->
 
 # Respond to a IIIF Image Information Request with JSON
 app.get '*info.json', (req, res) ->
-  # Information requests are easy to parse.
+  ###
+  Information requests are easy to parse, so we just take the next to the
+  last element to make our id. Note that this image server does not
+  decodeURIComponent as our implementation of a file resolver in
+  resolve_image_path is not robust enough to defend against a directory
+  traversal attack.
+  ###
   url = req.url
   url_parts = url.split('/')
   id = url_parts[url_parts.length - 2]
@@ -152,7 +159,8 @@ app.get '*.:format(jpg|png)', (req, res) ->
           completely valid.
 
           In cases where we do have the image information from the
-          info_cache we do a fuller validation of the request (is it in bounds?).
+          info_cache (say when we've already responded to an info.json request)
+          we do a fuller validation of the request (is it in bounds?).
           ###
           image_info = info_cache.get params.identifier
           valid_request = if image_info
