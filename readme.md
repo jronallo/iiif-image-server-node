@@ -13,7 +13,7 @@ npm i
 npm start
 ```
 
-In your browser visit <http://localhost:3000/index.html?id=trumpler14>
+In your browser visit <http://localhost:3001/index.html?id=trumpler14>
 
 ## Development
 

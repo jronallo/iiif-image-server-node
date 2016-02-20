@@ -1,0 +1,6 @@
+# Choose which JP2 binaries to use.
+# These binaries must be in the PATH of the user who runs the image server.
+# kdu => Kakadu => kdu_jp2info and kdu_expand
+# opj => OpenJPEG => opj_dump and opj_decompress
+
+jp2_binary: 'opj'

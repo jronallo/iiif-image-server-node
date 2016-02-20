@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "./node_modules/coffee-script/bin/coffee --watch --compile --output lib src",
-    "start": "node lib/index.js"
+    "start": "node lib/index.js",
+    "watch": "nodemon -e js,yml"
   },
   "repository": {
     "type": "git",
@@ -22,8 +23,10 @@
     "coffee-script": "^1.10.0"
   },
   "dependencies": {
+    "config": "^1.19.0",
     "express": "^4.13.4",
-    "iiif-image": "0.0.2",
+    "iiif-image": "0.0.3",
+    "js-yaml": "^3.5.3",
     "lodash": "^4.3.0",
     "node-cache": "^3.1.0",
     "openseadragon": "^2.1.0",

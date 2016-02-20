@@ -6,9 +6,13 @@ _ = require 'lodash'
 path = require 'path'
 fs = require 'fs'
 
+# configuration from config directory
+config = require 'config'
+jp2_binary = config.get 'jp2_binary'
+
 # All the IIIF tools we need here
 iiif = require 'iiif-image'
-Informer = iiif.InformerJp2Openjpeg
+Informer = iiif.Informer(jp2_binary)
 Parser = iiif.ImageRequestParser
 InfoJSONCreator = iiif.InfoJSONCreator
 Validator = iiif.Validator
@@ -191,5 +195,5 @@ app.get '*.:format(jpg|png)', (req, res) ->
 app.get '*', (req, res) ->
   res.status(404).send('404 not found')
 
-app.listen 3000, () ->
-  console.log('Example IIIF image server listening on port 3000! Visit http://localhost:3000/index.html?id=trumpler14')
+app.listen 3001, () ->
+  console.log('Example IIIF image server listening on port 3001! Visit http://localhost:3000/index.html?id=trumpler14')

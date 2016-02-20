@@ -2,24 +2,22 @@ resolve_image_path = require('./resolver').resolve_image_path
 _ = require 'lodash'
 tempfile = require 'tempfile'
 fs = require 'fs'
+
+# configuration from the config directory
+config = require 'config'
+jp2_binary = config.get 'jp2_binary'
+
 iiif = require 'iiif-image'
-Informer = iiif.InformerJp2Openjpeg
+Informer = iiif.Informer(jp2_binary)
+Extractor = iiif.Extractor(jp2_binary)
 Validator = iiif.Validator
 slugify_path = require './slugify-path'
 path_for_image_temp_file = require './path-for-image-temp-file'
 
 ###
-Choose which extractor you want to use:
-opj => OpenJPEG => opj_decompress
-kdu => Kakadu => kdu_expand
-###
-Extractor = iiif.Extractor('opj')
-
-###
 This function needs the response object and the incoming URL to parse the URL,
 get information about the image, extract the requested image, and provide a
 response to the client.
-TODO: is it worth it to break this out when we have to pass so much in?
 ###
 
 image_extraction = (res, url, params, info_cache, image_cache) ->
