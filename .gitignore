@@ -2,5 +2,7 @@ node_modules
 npm-debug*
 .bundle
 .vagrant
-images/seg*
 scripts
+
+images/seg*
+public/seg*
