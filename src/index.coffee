@@ -16,6 +16,8 @@ Validator = iiif.Validator
 # image server functions
 image_extraction = require('./image-extraction').image_extraction
 resolve_image_path = require('./resolver').resolve_image_path
+slugify_path = require './slugify-path'
+path_for_image_temp_file = require './path-for-image-temp-file'
 
 ###
 We'll create two different memory caches. One will keep image information
@@ -23,11 +25,27 @@ for the life of the process and the other will be to cache images to the file
 system for a specified amount of time.
 ###
 NodeCache = require('node-cache')
+###
+We cache the image information since getting the information from the cache will
+be faster than using a child process to return the information. This is
+completely in memory of the node instance so does not persist across instances
+or restarts.
+###
 info_cache = new NodeCache()
-image_cache = new NodeCache stdTTL: 86400, checkperiod: 3600
+###
+The image_cache is really only used for expiration of the image cache from
+the file system. This works fine for single process applications, but if you
+begin to scale out to multiple processes then you will want to use a shared
+cache like Memcached.
+###
+ttl = 86400
+checkperiod = 3600
+image_cache = new NodeCache stdTTL: ttl, checkperiod: checkperiod
 image_cache.on 'del', (key, cached_image_path) ->
   console.log "Image deleted: #{key} #{cached_image_path}"
-  fs.unlink cached_image_path
+  fs.unlink cached_image_path, (err) ->
+    # do nothing
+    return
 
 # Serve a web page for an openseadragon viewer.
 # http://localhost:3000/index.html?id=trumpler14
@@ -92,58 +110,76 @@ app.get '*info.json', (req, res) ->
 
 # The actual image server.
 # This image server will only accept requests for jpg and png images.
-app.get '*.(jpg|png)', (req, res) ->
+app.get '*.:format(jpg|png)', (req, res) ->
   url = req.url
-
-  # First we parse the URL to extract all the information we'll need from the
-  # request to choose the correct image, extract information from it, and
-  # create the requested image.
-  parser = new Parser url
-  params = parser.parse()
-  image_path = resolve_image_path(params.identifier)
-
   ###
-  Check to see if the image exists. If not return a 404. If the image exists
-  return the information about the image.
+  If the slugged image exists just serve that up. This allows cached images
+  to be used across instances of the application, but will still not handle
+  cache expiration in a unified way. This is why we check for the status of the
+  file rather than relying on the memory cache to know whether this is an
+  image_cache hit or not.
   ###
-  fs.stat image_path, (err, stats) ->
-    if err
-      res.status(404).send('404')
+  slug = slugify_path(url)
+  image_temp_file = path_for_image_temp_file(slug)
+  fs.stat image_temp_file, (err, stats) ->
+    if !err
+      console.log "cache image hit: #{url} #{image_temp_file}"
+      # Since this is a cache hit expand the time to live in the cache.
+      image_cache.ttl url, ttl
+      res.sendFile image_temp_file
     else
-      # If the image is cached try to serve the cached image
-      cache_image_path = image_cache.get url
-      if cache_image_path
-        # Check to see if the image exists
-        fs.stat cache_image_path, (err, stats) ->
-          # If there is an error delete the key from the cache, and
-          # just run the image extraction like normal. Pass the response in
-          # with the url which is all that is needed to respond.
-          if err
-            image_cache.del url
-            # If the file does not exist we extract the image again.
+      console.log "cache image miss: #{url} #{image_temp_file}"
+
+      ###
+      First we parse the URL to extract all the information we'll need from the
+      request to choose the correct image.
+      ###
+      parser = new Parser url
+      params = parser.parse()
+      image_path = resolve_image_path(params.identifier)
+
+      ###
+      Check to see if the source image exists. If not return a 404.
+      ###
+      fs.stat image_path, (err, stats) ->
+        if err
+          res.status(404).send('404')
+        else
+          ###
+          We do a quick check whether the parameters of the request are valid
+          before trying the extraction. If we do not have the image information
+          yet, the check here is not able to check whether the request is
+          completely valid.
+
+          In cases where we do have the image information from the
+          info_cache we do a fuller validation of the request (is it in bounds?).
+          ###
+          image_info = info_cache.get params.identifier
+          valid_request = if image_info
+            validator = new Validator params, image_info
+            validity = validator.valid()
+            if validity
+              console.log "valid with info: #{url}"
+            else
+              console.log "invalid with info: #{url}"
+            validity
+          else
+            validator = new Validator params
+            validity = validator.valid_params()
+            if validity
+              console.log "valid with params: #{url}"
+            else
+              console.log "invalid with params: #{url}"
+            validity
+          # If we have a valid request we try to return an image.
+          if valid_request
+            # This is where most of the work happens!!!
             image_extraction(res, url, params, info_cache, image_cache)
           else
-            # A good cache hit so we serve the cached image.
-            res.sendFile cache_image_path
-      else # If the image is not cached run the extraction.
+            console.log "invalid request: #{url}"
+            res.status(400).send('400 error')
 
-        ###
-        We do a quick check whether the parameters of the request are valid
-        before trying the extraction. The check here is not able to check
-        whether the request is completely valid because we do not have the image
-        information yet.
-        TODO: In cases where we do have the image information from the
-        info_cache we could do a fuller validation of the request (does it result in
-        a 0 pixel image? Is the request out of bounds of the image?).
-        ###
-        validator = new Validator params
-        if validator.valid_params()
-          # This is where most of the work happens:
-          image_extraction(res, url, params, info_cache, image_cache)
-        else
-          res.status(400).send('400 error')
-
-# TODO: Catch all route that probably ought to return a response code.
+# Catch all other results and return a response code.
 app.get '*', (req, res) ->
   res.status(404).send('404 not found')
 
