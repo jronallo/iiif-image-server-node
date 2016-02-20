@@ -2,6 +2,10 @@
 
 Simple example IIIF Image server written in Node to show the use of the `iiif-image` module.
 
+## Requirements
+
+In order to handle JP2 files you'll need to install OpenJPEG (`opj_decompress` & `opj_dump`). You can also make some changes to the code to enable the more performant but proprietary Kakadu executables (`kdu_expand` & `kdu_jp2info`).
+
 ## Usage
 
 ```sh
@@ -19,7 +23,7 @@ In another terminal run `nodemon` to restart the server on changes.
 
 ## Vagrant
 
-Currently dependencies are installed with ansible roles from a private repository. These roles install nodejs and passenger. We're working to make this repository public. You'll also need to install the Kakadu executables, which we do not distribute.
+Currently dependencies are installed with ansible roles from a private repository. These roles install nodejs and passenger. We're working to make this repository public.
 
 Once everything is installed you can visit: <http://localhost:8088/index.html?id=trumpler14>
 
