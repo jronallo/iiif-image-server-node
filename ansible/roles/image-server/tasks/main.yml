@@ -1,0 +1,22 @@
+---
+- name: dependencies
+  yum:
+    pkg: "{{item}}"
+    state: present
+    update_cache: yes
+  with_items:
+    - unzip
+    - openjpeg2-tools
+- name: openjpeg-tools symlinks
+  file:
+    src: "/usr/bin/{{item.cmd}}"
+    dest: "/usr/local/bin/{{item.link}}"
+    state: link
+  with_items:
+    - { link: 'opj_decompress', cmd: 'opj2_decompress'}
+    - { link: 'opj_dump', cmd: 'opj2_dump'}
+- name: npm install
+  become: no
+  shell: chdir={{app_deploy_path}} npm i
+- name: restart nginx
+  service: name=nginx state=restarted

@@ -7,25 +7,15 @@
   gather_facts: yes
   vars:
     project_name: iiif-image-server
+    # These are used in the passenger-nginx role
+    app_deploy_path: /iiif-image-server
+    passenger_startup_file: lib/index.js
+
   roles:
     - role: passenger-nginx
+    - role: image-server
+
   post_tasks:
-    - name: dependencies
-      yum:
-        pkg: "{{item}}"
-        state: present
-        update_cache: yes
-      with_items:
-        - unzip
-        - openjpeg2-tools
-    - name: openjpeg-tools symlinks
-      file:
-        src: "/usr/bin/{{item.cmd}}"
-        dest: "/usr/local/bin/{{item.link}}"
-        state: link
-      with_items:
-        - { link: 'opj_decompress', cmd: 'opj2_decompress'}
-        - { link: 'opj_dump', cmd: 'opj2_dump'}
     - name: mkdir ~/.npm-global
       become: no
       file: path=~/.npm-global state=directory
@@ -37,11 +27,6 @@
       lineinfile:
         dest: ~/.bash_profile
         line: export PATH=~/.npm-global/bin:$PATH
-    - name: npm install
-      become: no
-      shell: chdir=/iiif-image-server npm i
-    - name: restart nginx
-      service: name=nginx state=restarted
     - name: install nodemon
       become: no
       shell: npm i -g nodemon
