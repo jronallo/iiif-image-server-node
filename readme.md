@@ -10,7 +10,9 @@ Some Level 2 features are available like rotationBy90s and png format should wor
 
 ## Requirements
 
-In order to handle JP2 files you'll need to install OpenJPEG (`opj_decompress` & `opj_dump`). You can also make some changes to the code to enable the more performant but proprietary Kakadu executables (`kdu_expand` & `kdu_jp2info`).
+Currently `iiif-image` only works with JPEG2000 images. In order to handle JP2 files you'll need to install OpenJPEG (`opj_decompress` & `opj_dump`). You can also change the `jp2_binary` configuration (see confing/default.yml) to enable the more performant but proprietary Kakadu executables (`kdu_expand` & `kdu_jp2info`; see notice below about Kakadu).
+
+`iiif-image` also relies on [sharp](http://sharp.dimens.io/en/stable/) for image processing which depends on libvips. Only OSX ought to need to install libvips.
 
 ## Usage
 
@@ -23,15 +25,19 @@ In your browser visit <http://localhost:3001/viewer/trumpler14>
 
 ## Configuration
 
-See the config directory.
+See the config directory in the default.yml file for notes on settings.
+
+See [node-config](https://github.com/lorenwest/node-config) for how to override the defaults for different environments. Note that for the most part all settings must be present, though for a particular environment you only have to include the differences from the default.
 
 ## Development
 
 In one terminal run `npm run compile` to compile the Coffeescript.
 
-In another terminal run `nodemon` to restart the server on changes.
+In another terminal run `npm run watch` to restart the server on changes.
 
-## Vagrant
+Run the tests with `npm run watch_test` for test reloading or just `npm test` to run them once.
+
+## Vagrant and Server Deploys
 
 The Ansible playbook and roles show how to get the server deployed to a CentOS 7 machine. You can run them with:
 
@@ -54,6 +60,7 @@ Different keys tell you where in the code the log message comes from:
 `res`: What kind of response has been sent. Will either be "info", "image", "viewer", or a status code.
 
 ## TODO
+- Cache info.json to the filesystem without expiration.
 - Ansible deploy scripts should set expires headers via nginx (or node?)
 - Can performance be improved if output of opj_decompress and kdu_expand is streamed through a socket? How would this work? http://stackoverflow.com/questions/11750041/how-to-create-a-named-pipe-in-node-js/18226566#18226566
 
