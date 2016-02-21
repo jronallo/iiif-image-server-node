@@ -87,4 +87,4 @@ app.get '*', (req, res) ->
   res.status(404).send('404 not found')
 
 app.listen 3001, () ->
-  console.log('Example IIIF image server listening on port 3001! Visit http://localhost:3000/viewer/trumpler14')
+  console.log('Example IIIF image server listening on port 3001! Visit http://localhost:3001/viewer/trumpler14')
