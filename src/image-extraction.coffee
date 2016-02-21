@@ -82,4 +82,4 @@ image_extraction = (res, url, params, info_cache, image_cache) ->
     informer = new Informer image_path, info_cb
     informer.inform()
 
-exports.image_extraction = image_extraction
+module.exports = image_extraction

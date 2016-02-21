@@ -22,3 +22,6 @@ resolver:
   # in this project will be used. Any other value ought to be the full base
   # path for resolving images.
   base_path: false
+
+# Should the routes for the openseadragon viewer be enabled?
+viewer: true
