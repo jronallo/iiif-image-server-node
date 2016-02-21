@@ -1,5 +1,4 @@
-
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function(event) {
   var image_id, loc, osd_config, viewer;
 
   loc = window.location.toString();
