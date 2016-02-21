@@ -2,6 +2,12 @@
 
 Simple example IIIF Image server written in Node to show the use of the `iiif-image` module.
 
+## Compliance
+
+[IIIF Image API version 2.0](http://iiif.io/api/image/2.0/), [Level 1 compliant](http://iiif.io/api/image/2.0/compliance/).
+
+Some Level 2 features are available like rotationBy90s and png format should work.
+
 ## Requirements
 
 In order to handle JP2 files you'll need to install OpenJPEG (`opj_decompress` & `opj_dump`). You can also make some changes to the code to enable the more performant but proprietary Kakadu executables (`kdu_expand` & `kdu_jp2info`).
