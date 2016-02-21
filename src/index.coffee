@@ -89,10 +89,7 @@ app.get '*info.json', (req, res) ->
 # The actual image server.
 # This image server will only accept requests for jpg and png images.
 app.get '*.:format(jpg|png)', (req, res) ->
-  if req.url.match('pct:')
-    res.status(400).send('400 pct: not implemented')
-  else
-    image_response(req, res, info_cache, image_cache)
+  image_response(req, res, info_cache, image_cache)
 
 # Catch all other requests. In some cases this will be a
 # request with an image identifier in which case we
