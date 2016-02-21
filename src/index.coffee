@@ -53,8 +53,9 @@ app.use(express.static('public'))
 if config.get('viewer')
   # Serve a web page for an openseadragon viewer.
   # http://localhost:3000/index.html?id=trumpler14
-  app.get '/index.html', (req, res) ->
+  app.get '/viewer/:id/', (req, res) ->
     index = path.join __dirname, "/../app/index.html"
+    res.setHeader('Content-Type', 'text/html')
     res.sendFile(index)
 
   # Javascript from openseadragon
@@ -86,4 +87,4 @@ app.get '*', (req, res) ->
   res.status(404).send('404 not found')
 
 app.listen 3001, () ->
-  console.log('Example IIIF image server listening on port 3001! Visit http://localhost:3000/index.html?id=trumpler14')
+  console.log('Example IIIF image server listening on port 3001! Visit http://localhost:3000/viewer/trumpler14')

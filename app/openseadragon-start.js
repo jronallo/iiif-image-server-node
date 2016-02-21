@@ -1,20 +1,13 @@
 
 $(document).ready(function() {
-  var image_id, location, osd_config, viewer, qd={};
-  window.location.search.substr(1).split("&").forEach(function(item) {
-      var s = item.split("="),
-          k = s[0],
-          v = s[1] && decodeURIComponent(s[1]);
-      (k in qd) ? qd[k].push(v) : qd[k] = [v]
-  });
+  var image_id, loc, osd_config, viewer;
 
-  image_id = qd.id[0]
-  console.log(image_id);
-  // location.query.id;
-  console.log(image_id);
+  loc = window.location.toString();
+  image_id = loc.split('/').pop();
+  console.log("image_id: "+image_id);
   osd_config = {
     id: 'openseadragon',
-    prefixUrl: 'openseadragon/images/',
+    prefixUrl: '../openseadragon/images/',
     preserveViewport: true,
     visibilityRatio: 1,
     minZoomLevel: 1,

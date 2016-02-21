@@ -13,7 +13,7 @@ npm i
 npm start
 ```
 
-In your browser visit <http://localhost:3001/index.html?id=trumpler14>
+In your browser visit <http://localhost:3001/viewer/trumpler14>
 
 ## Development
 
@@ -23,9 +23,9 @@ In another terminal run `nodemon` to restart the server on changes.
 
 ## Vagrant
 
-Currently dependencies are installed with ansible roles from a private repository. These roles install nodejs and passenger. We're working to make this repository public.
+`vagrant up`
 
-Once everything is installed you can visit: <http://localhost:8088/index.html?id=trumpler14>
+Once everything is installed you can visit: <http://localhost:8088/viewer/trumpler14>
 
 ## Kakadu Copyright Notice and Disclaimer
  We do not distribute the Kakadu executables. You will need to install the Kakadu binaries/executables available [here](http://kakadusoftware.com/downloads/). The executables available there are made available for demonstration purposes only. Neither the author, Dr. Taubman, nor UNSW Australia accept any liability arising from their use or re-distribution.
