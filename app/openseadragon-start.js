@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     visibilityRatio: 1,
     minZoomLevel: 1,
     defaultZoomLevel: 1,
-    sequenceMode: true,
+    sequenceMode: false,
     tiles: [
       {
         scaleFactors: [1, 2, 4, 8, 16, 32],
