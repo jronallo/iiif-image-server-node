@@ -9,6 +9,7 @@ caching solution won't work for every image server.
 
 path = require 'path'
 os = require 'os'
+log = require('./index').log
 config = require 'config'
 
 path_for_image_cache_file = (filepath) ->

@@ -6,6 +6,7 @@ images are going to be JP2s.
 ###
 
 path = require 'path'
+log = require('./index').log
 config = require 'config'
 resolver_base_path = config.get('resolver.base_path')
 

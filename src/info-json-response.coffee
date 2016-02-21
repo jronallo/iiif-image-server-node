@@ -1,6 +1,9 @@
 fs = require 'fs'
 _ = require 'lodash'
 
+log = require('./index').log
+info_cache = require('./index').info_cache
+
 config = require 'config'
 jp2_binary = config.get 'jp2_binary'
 
@@ -10,7 +13,7 @@ Informer = iiif.Informer(jp2_binary)
 
 resolve_image_path = require('./resolver').resolve_image_path
 
-info_json_response = (req, res, info_cache) ->
+info_json_response = (req, res) ->
   ###
   Information requests are easy to parse, so we just take the next to the
   last element to make our id. Note that this image server does not
@@ -43,6 +46,7 @@ info_json_response = (req, res, info_cache) ->
       info_cb = (info) ->
         if !info_cache.get(id)
           info_cache.set id, info
+          log.info {cache: 'info', op: 'set', url: req.url, ip: req.ip}, 'image cached'
         info_json_creator = new InfoJSONCreator info, server_info
         # If the request asks for ld+json we return with the
         # same content-type. Otherwise we can just return
@@ -55,8 +59,10 @@ info_json_response = (req, res, info_cache) ->
       # image again.
       cache_info = info_cache.get id
       if cache_info
+        log.info {cache: 'info', found: 'hit', url: req.url, ip: req.ip}
         info_cb(_.cloneDeep cache_info)
       else
+        log.info {cache: 'info', found: 'miss', url: req.url, ip: req.ip}
         informer = new Informer image_path, info_cb
         informer.inform()
 

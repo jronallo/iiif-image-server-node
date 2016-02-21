@@ -4,6 +4,8 @@ npm-debug*
 .vagrant
 scripts
 
+log/*log
+
 images/seg*
 images/hs*
 images/moon*

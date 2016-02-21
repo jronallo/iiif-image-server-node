@@ -1,5 +1,10 @@
 fs = require 'fs' # Used to test presence of files
 
+# exported from main
+log = require('./index').log
+info_cache = require('./index').info_cache
+image_cache = require('./index').image_cache
+
 config = require 'config' # Configuration from config directory
 
 # The iiif-image pieces the image response needs. Note that image-extraction
@@ -16,7 +21,7 @@ image_extraction = require('./image-extraction')
 
 ttl = config.get('cache.image.ttl')
 
-image_response = (req, res, info_cache, image_cache) ->
+image_response = (req, res) ->
   url = req.url
   ###
   If the image exists just serve that up. This allows cached images
@@ -28,12 +33,12 @@ image_response = (req, res, info_cache, image_cache) ->
   image_temp_file = path_for_image_cache_file(url)
   fs.stat image_temp_file, (err, stats) ->
     if !err
-      console.log "cache image hit: #{url} #{image_temp_file}"
+      log.info {cache: 'image', found: 'hit', url: url, img: image_temp_file}
       # Since this is a cache hit expand the time to live in the cache.
       image_cache.ttl url, ttl
       res.sendFile image_temp_file
     else
-      console.log "cache image miss: #{url} #{image_temp_file}"
+      log.info {cache: 'image', found: 'miss', url: url, img: image_temp_file}
 
       ###
       First we parse the URL to extract all the information we'll need from the
@@ -65,24 +70,24 @@ image_response = (req, res, info_cache, image_cache) ->
             validator = new Validator params, image_info
             validity = validator.valid()
             if validity
-              console.log "valid with info: #{url}"
+              log.info {valid: true, test: 'info', url: url, ip: req.ip}, 'valid w/ info'
             else
-              console.log "invalid with info: #{url}"
-            validity
+              log.info {valid: false, test: 'info', url: url, ip: req.ip}, 'invalid w/ info'
+            validity # return
           else
             validator = new Validator params
             validity = validator.valid_params()
             if validity
-              console.log "valid with params: #{url}"
+              log.info {valid: true, test: 'params', url: url, ip: req.ip}, 'valid with params'
             else
-              console.log "invalid with params: #{url}"
-            validity
+              log.info {valid: false, test: 'params', url: url, ip: req.ip}, 'invalid with params'
+            validity # return
+
           # If we have a valid request we try to return an image.
           if valid_request
             # This is where most of the work happens!!!
-            image_extraction(res, url, params, info_cache, image_cache)
+            image_extraction(req, res, params)
           else
-            console.log "invalid request: #{url}"
             res.status(400).send('400 error')
 
 module.exports = image_response

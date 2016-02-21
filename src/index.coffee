@@ -9,12 +9,26 @@ fs = require 'fs' # Used to unlink images expired from the cache.
 # Configuration from config directory.
 config = require 'config'
 
-# Image server specific functions:
-# TODO: Allow for selecting a custom implementation of info_json_response
-info_json_response = require './info-json-response'
-# TODO: Allow for selecting a custom implementation for image response
-image_response = require './image-response'
-resolve_image_path = require('./resolver').resolve_image_path
+###
+Logging
+Currently we have one logger that logs to stdout and to a file in the log
+directory.
+###
+bunyan = require 'bunyan'
+log_file_path = path.join __dirname, '../log/iiif.log'
+log = bunyan.createLogger {
+  name: 'iiif'
+  streams: [
+    {
+      level: 'debug',
+      stream: process.stdout
+    },
+    {
+      level: 'debug'
+      path: log_file_path
+    }
+  ]
+}
 
 ###
 Caching
@@ -36,15 +50,41 @@ the file system. This works fine for single process applications, but if you
 begin to scale out to multiple processes then you will want to use a shared
 cache like Memcached.
 ###
-ttl = config.get('cache.image.ttl')
-checkperiod = config.get('cache.image.checkperiod')
-console.log "Image cache: ttl:#{ttl} checkperiod:#{checkperiod}"
-image_cache = new NodeCache stdTTL: ttl, checkperiod: checkperiod
+image_cache_ttl = config.get('cache.image.ttl')
+image_cache_checkperiod = config.get('cache.image.checkperiod')
+log.info {ttl: image_cache_ttl, checkperiod: image_cache_checkperiod}, 'image_cache settings'
+
+# Create the image_cache
+image_cache = new NodeCache stdTTL: image_cache_ttl, checkperiod: image_cache_checkperiod
+
+###
+When an image gets deleted or expired from the cache unlink the cached file.
+###
 image_cache.on 'del', (key, cached_image_path) ->
-  console.log "Image deleted: #{key} #{cached_image_path}"
+  log.info {cache: 'image', op: 'del', key: key, img: cached_image_path}, "image deleted"
   fs.unlink cached_image_path, (err) ->
     # Do nothing since we have already achieved our goal to remove the file.
     return
+
+###
+Exports
+###
+exports.log = log
+exports.image_cache = image_cache
+exports.info_cache = info_cache
+
+###
+Image server specific functions.
+Note that the order of the code here is important!
+These local modules must be required _after_ the Exports section of this code
+so that they are available when we need them in these modules. Otherwise
+log etc. will be undefined within the modules.
+###
+# TODO: Allow for selecting a custom implementation of info_json_response
+info_json_response = require './info-json-response'
+# TODO: Allow for selecting a custom implementation for image response
+image_response = require './image-response'
+resolve_image_path = require('./resolver').resolve_image_path
 
 # Serve static cached images from the public directory.
 # See the config setting cache.image.base_path for more information.
@@ -55,6 +95,7 @@ if config.get('viewer')
   # Serve a web page for an openseadragon viewer.
   # http://localhost:3000/index.html?id=trumpler14
   app.get '/viewer/:id/', (req, res) ->
+    log.info {route: 'viewer', url: req.url, ip: req.ip}
     image_path = resolve_image_path(req.params.id)
     fs.stat image_path, (err, stats) ->
       if err
@@ -81,6 +122,7 @@ if config.get('viewer')
 
 # Respond to a IIIF Image Information Request with JSON
 app.get '*info.json', (req, res) ->
+  log.info {route: 'info.json', url: req.url, ip: req.ip}
   # Set CORS header
   if config.get 'cors'
     res.header "Access-Control-Allow-Origin", config.get 'cors'
@@ -88,13 +130,15 @@ app.get '*info.json', (req, res) ->
 
 # The actual image server.
 # This image server will only accept requests for jpg and png images.
-app.get '*.:format(jpg|png)', (req, res) ->
+app.get '*default.:format(jpg|png)', (req, res) ->
+  log.info {route: 'image', url: req.url, ip: req.ip}
   image_response(req, res, info_cache, image_cache)
 
 # Catch all other requests. In some cases this will be a
 # request with an image identifier in which case we
 # redirect to the info.json.
 app.get '*', (req, res) ->
+  log.info {route: '*', url: req.url, ip: req.ip}
   # If the first part of the path is an identifier and there
   # are no other path segements then we redirect to the
   # info.json response.

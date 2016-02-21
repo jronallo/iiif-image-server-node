@@ -39,6 +39,18 @@ The Ansible playbook and roles show how to get the server deployed to a CentOS 7
 
 Once everything is installed you can visit: <http://localhost:8088/viewer/trumpler14>
 
+## Logging
+
+Currently everything is logged to log/iiif.log with [Bunyan](https://github.com/trentm/node-bunyan). Bunyan logs as JSON and comes with a commandline tool to sort through log files and make them pretty for inspection.
+
+Different keys tell you where in the code the log message comes from:
+
+`route`: Basic logging for the main routes in the main application. The requested `url` and requestor `ip` are also logged.
+
+`cache`: Tells which cache the logging message is for. Currently values would be "image" or "info". Other keys are used with `cache`. `found`: Has values "hit" or "miss". `img` is the path to the image. Also cache operations will use the `op` key.
+
+`valid`: Information about the validity of requests. Has a value of true or false. `test` says whether the test for validity was done on just the request parameters with "params" or also include the image information for a fuller validity check with "info".
+
 ## TODO
 - Ansible deploy scripts should set expires headers via nginx (or node?)
 - Can performance be improved if output of opj_decompress and kdu_expand is streamed through a socket? How would this work? http://stackoverflow.com/questions/11750041/how-to-create-a-named-pipe-in-node-js/18226566#18226566

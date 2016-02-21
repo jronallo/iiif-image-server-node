@@ -13,7 +13,7 @@ cache:
     # tmpdir: Use the system temporary directory
     # public: Use the project's public directory. This can be useful for allowing
     #         the web server, say behind Passenger, to serve up the image files
-    #         directly.
+    #         directly never hitting Node.
     # Any other string will be treated like the
     base_path: 'public'
 
