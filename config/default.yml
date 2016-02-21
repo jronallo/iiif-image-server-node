@@ -25,3 +25,9 @@ resolver:
 
 # Should the routes for the openseadragon viewer be enabled?
 viewer: true
+
+# Set the CORS headers you want for the info.json response.
+# By default everywhere is allowed. To turn off CORS change this value
+# to false. To restrict it change it to another string.
+cors: '*'
+# cors: false

@@ -81,16 +81,37 @@ if config.get('viewer')
 
 # Respond to a IIIF Image Information Request with JSON
 app.get '*info.json', (req, res) ->
+  # Set CORS header
+  if config.get 'cors'
+    res.header "Access-Control-Allow-Origin", config.get 'cors'
   info_json_response(req, res, info_cache)
 
 # The actual image server.
 # This image server will only accept requests for jpg and png images.
 app.get '*.:format(jpg|png)', (req, res) ->
-  image_response(req, res, info_cache, image_cache)
+  if req.url.match('pct:')
+    res.status(400).send('400 pct: not implemented')
+  else
+    image_response(req, res, info_cache, image_cache)
 
-# Catch all other results and return a response code.
+# Catch all other requests. In some cases this will be a
+# request with an image identifier in which case we
+# redirect to the info.json.
 app.get '*', (req, res) ->
-  res.status(404).send('404 not found')
+  # If the first part of the path is an identifier and there
+  # are no other path segements then we redirect to the
+  # info.json response.
+  url = req.url
+  url_parts = url.split('/')
+  possible_image_identifier = url_parts[0]
+  possible_image_path = resolve_image_path possible_image_identifier
+  fs.stat possible_image_path, (err, stats) ->
+    if err
+      # Catch all other results and return a response code.
+      res.status(400).send('400 not found')
+    else
+      res.redirect '303', "/#{possible_image_identifier}/info.json"
+
 
 if require.main == module
   port = process.env.PORT || 3001

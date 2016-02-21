@@ -44,6 +44,11 @@ info_json_response = (req, res, info_cache) ->
         if !info_cache.get(id)
           info_cache.set id, info
         info_json_creator = new InfoJSONCreator info, server_info
+        # If the request asks for ld+json we return with the
+        # same content-type. Otherwise we can just return
+        # application/json be default.
+        if req.get('Accept') && req.get('Accept').match /application\/ld\+json/
+          res.set('Content-Type', 'application/ld+json')
         res.send info_json_creator.info_json
 
       # If the information is already in the cache we do not have to inspect the
