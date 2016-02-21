@@ -36,6 +36,7 @@ image_response = (req, res) ->
       log.info {cache: 'image', found: 'hit', url: url, img: image_temp_file}
       # Since this is a cache hit expand the time to live in the cache.
       image_cache.ttl url, ttl
+      log.info {res: 'image', url: url, ip: req.ip}, 'response image'
       res.sendFile image_temp_file
     else
       log.info {cache: 'image', found: 'miss', url: url, img: image_temp_file}
@@ -53,6 +54,7 @@ image_response = (req, res) ->
       ###
       fs.stat image_path, (err, stats) ->
         if err
+          log.info {res: '404', url: url, ip: req.ip}, '404'
           res.status(404).send('404')
         else
           ###
@@ -88,6 +90,7 @@ image_response = (req, res) ->
             # This is where most of the work happens!!!
             image_extraction(req, res, params)
           else
+            log.info {res: '400', url: url, ip: req.ip}, '400'
             res.status(400).send('400 error')
 
 module.exports = image_response

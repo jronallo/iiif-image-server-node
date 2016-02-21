@@ -44,7 +44,9 @@ image_extraction = (req, res, params) ->
     off the file system.
     ###
     # TODO: If a String is returned then use sendFile else return the buffer.
+    log.info {res: 'image', url: url, ip: req.ip}, 'response image'
     res.send image
+
     # After we send the image we can cache it for a time.
     if !image_cache.get url
       image_path = path_for_image_cache_file url
@@ -82,6 +84,7 @@ image_extraction = (req, res, params) ->
       extractor.extract()
     else # not valid!
       log.info {valid: false, test: 'info', url: url, ip: req.ip}, 'invalid w/ info'
+      log.info {res: '400', url: url, ip: req.ip}, '400'
       res.status(400).send('400')
 
   # If the information for the image is in the cache then we do not run the

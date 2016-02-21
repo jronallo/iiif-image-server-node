@@ -41,7 +41,7 @@ Once everything is installed you can visit: <http://localhost:8088/viewer/trumpl
 
 ## Logging
 
-Currently everything is logged to log/iiif.log with [Bunyan](https://github.com/trentm/node-bunyan). Bunyan logs as JSON and comes with a commandline tool to sort through log files and make them pretty for inspection.
+Currently everything is logged to ./log/iiif.log with [Bunyan](https://github.com/trentm/node-bunyan). Bunyan logs as JSON and comes with a command line tool to sort through log files and make them pretty for inspection.
 
 Different keys tell you where in the code the log message comes from:
 
@@ -50,6 +50,8 @@ Different keys tell you where in the code the log message comes from:
 `cache`: Tells which cache the logging message is for. Currently values would be "image" or "info". Other keys are used with `cache`. `found`: Has values "hit" or "miss". `img` is the path to the image. Also cache operations will use the `op` key.
 
 `valid`: Information about the validity of requests. Has a value of true or false. `test` says whether the test for validity was done on just the request parameters with "params" or also include the image information for a fuller validity check with "info".
+
+`res`: What kind of response has been sent. Will either be "info", "image", "viewer", or a status code.
 
 ## TODO
 - Ansible deploy scripts should set expires headers via nginx (or node?)

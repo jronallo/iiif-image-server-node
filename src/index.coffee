@@ -99,8 +99,10 @@ if config.get('viewer')
     image_path = resolve_image_path(req.params.id)
     fs.stat image_path, (err, stats) ->
       if err
+        log.info {res: '404', url: url, ip: req.ip}, '404'
         res.status(404).send('404')
       else
+        log.info {res: 'viewer', url: url, ip: req.ip}, '400'
         index = path.join __dirname, "/../app/index.html"
         res.setHeader('Content-Type', 'text/html')
         res.sendFile(index)
@@ -148,9 +150,11 @@ app.get '*', (req, res) ->
   possible_image_path = resolve_image_path possible_image_identifier
   fs.stat possible_image_path, (err, stats) ->
     if err
+      log.info {res: '400', url: url, ip: req.ip}, '400'
       # Catch all other results and return a response code.
       res.status(400).send('400 not found')
     else
+      log.info {res: '303', url: url, ip: req.ip}, '303'
       res.redirect '303', "/#{possible_image_identifier}/info.json"
 
 

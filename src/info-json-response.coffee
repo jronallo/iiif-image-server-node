@@ -32,6 +32,7 @@ info_json_response = (req, res) ->
   ###
   fs.stat image_path, (err, stats) ->
     if err
+      log.info {res: '404', url: url, ip: req.ip}, '404'
       res.status(404).send('404')
     else
       # In order to create an IIIF information response we need just a little more
@@ -53,6 +54,7 @@ info_json_response = (req, res) ->
         # application/json be default.
         if req.get('Accept') && req.get('Accept').match /application\/ld\+json/
           res.set('Content-Type', 'application/ld+json')
+        log.info {res: 'info', url: url, ip: req.ip}, 'response info'
         res.send info_json_creator.info_json
 
       # If the information is already in the cache we do not have to inspect the
