@@ -15,6 +15,10 @@ npm start
 
 In your browser visit <http://localhost:3001/viewer/trumpler14>
 
+## Configuration
+
+See the config directory.
+
 ## Development
 
 In one terminal run `npm run compile` to compile the Coffeescript.
@@ -22,6 +26,8 @@ In one terminal run `npm run compile` to compile the Coffeescript.
 In another terminal run `nodemon` to restart the server on changes.
 
 ## Vagrant
+
+The Ansible playbook and roles show how to get the server deployed to a CentOS 7 machine. You can run them with:
 
 `vagrant up`
 
