@@ -15,7 +15,13 @@ Currently we have one logger that logs to stdout and to a file in the log
 directory.
 ###
 bunyan = require 'bunyan'
-log_file_path = path.join __dirname, '../log/iiif.log'
+
+###
+In order to have environment specific log files you will need to set NODE_ENV
+in your environment. You can see examples of how this is done in the scripts
+in package.json.
+###
+log_file_path = path.join __dirname, "../log/iiif-#{process.env.NODE_ENV}.log"
 log = bunyan.createLogger {
   name: 'iiif'
   streams: [
@@ -86,9 +92,14 @@ info_json_response = require './info-json-response'
 image_response = require './image-response'
 resolve_image_path = require('./resolver').resolve_image_path
 
-# Serve static cached images from the public directory.
-# See the config setting cache.image.base_path for more information.
-app.use(express.static('public'))
+###
+Static assets in this case means cached image files when the
+config.cache.image.base_path value is 'public'. Otherwise the image server
+has no need for serving up static assets. The
+###
+if config.get('cache.image.base_path') == 'public'
+  log.info 'Use Express to serve static assets'
+  app.use(express.static('public'))
 
 # Configuration allows the openseadragon viewer to be turned off.
 if config.get('viewer')
@@ -156,7 +167,6 @@ app.get '*', (req, res) ->
     else
       log.info {res: '303', url: url, ip: req.ip}, '303'
       res.redirect '303', "/#{possible_image_identifier}/info.json"
-
 
 if require.main == module
   port = process.env.PORT || 3001

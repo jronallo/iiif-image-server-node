@@ -4,11 +4,11 @@
   "description": "An example image server using the iiif-image module",
   "main": "lib/index.js",
   "scripts": {
-    "test": "reset; bin/coffeetape tests/**/*.test.coffee | tap-spec",
+    "test": "reset; NODE_ENV=test bin/coffeetape tests/**/*.test.coffee | tap-spec",
     "watch_test": "nodemon -q -e js,coffee --watch lib --watch tests -x 'npm test'",
     "compile": "./node_modules/coffee-script/bin/coffee --watch --compile --output lib src",
-    "start": "node lib/index.js",
-    "watch": "nodemon -e js,yml"
+    "start": "NODE_ENV=development node lib/index.js",
+    "watch": "NODE_ENV=development nodemon -e js,yml"
   },
   "repository": {
     "type": "git",
