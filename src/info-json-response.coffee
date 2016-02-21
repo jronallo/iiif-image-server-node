@@ -29,7 +29,7 @@ info_json_response = (req, res, info_cache) ->
   ###
   fs.stat image_path, (err, stats) ->
     if err
-      res.state(404).send('404')
+      res.status(404).send('404')
     else
       # In order to create an IIIF information response we need just a little more
       # data from the server than the Informer already provides for the images.

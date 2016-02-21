@@ -14,6 +14,7 @@ config = require 'config'
 info_json_response = require './info-json-response'
 # TODO: Allow for selecting a custom implementation for image response
 image_response = require './image-response'
+resolve_image_path = require('./resolver').resolve_image_path
 
 ###
 Caching
@@ -54,9 +55,14 @@ if config.get('viewer')
   # Serve a web page for an openseadragon viewer.
   # http://localhost:3000/index.html?id=trumpler14
   app.get '/viewer/:id/', (req, res) ->
-    index = path.join __dirname, "/../app/index.html"
-    res.setHeader('Content-Type', 'text/html')
-    res.sendFile(index)
+    image_path = resolve_image_path(req.params.id)
+    fs.stat image_path, (err, stats) ->
+      if err
+        res.status(404).send('404')
+      else
+        index = path.join __dirname, "/../app/index.html"
+        res.setHeader('Content-Type', 'text/html')
+        res.sendFile(index)
 
   # Javascript from openseadragon
   app.get '/openseadragon.js', (req, res) ->
@@ -86,5 +92,9 @@ app.get '*.:format(jpg|png)', (req, res) ->
 app.get '*', (req, res) ->
   res.status(404).send('404 not found')
 
-app.listen 3001, () ->
-  console.log('Example IIIF image server listening on port 3001! Visit http://localhost:3001/viewer/trumpler14')
+if require.main == module
+  port = process.env.PORT || 3001
+  app.listen port, () ->
+    console.log('Example IIIF image server listening on port 3001! Visit http://localhost:3001/viewer/trumpler14')
+
+exports.app = app
