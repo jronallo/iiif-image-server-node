@@ -27,6 +27,10 @@ In another terminal run `nodemon` to restart the server on changes.
 
 Once everything is installed you can visit: <http://localhost:8088/viewer/trumpler14>
 
+## TODO
+- Ansible deploy scripts should set expires headers via nginx (or node?)
+- Can performance be improved if output of opj_decompress and kdu_expand is streamed through a socket? How would this work? http://stackoverflow.com/questions/11750041/how-to-create-a-named-pipe-in-node-js/18226566#18226566
+
 ## Kakadu Copyright Notice and Disclaimer
  We do not distribute the Kakadu executables. You will need to install the Kakadu binaries/executables available [here](http://kakadusoftware.com/downloads/). The executables available there are made available for demonstration purposes only. Neither the author, Dr. Taubman, nor UNSW Australia accept any liability arising from their use or re-distribution.
 
