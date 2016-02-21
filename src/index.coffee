@@ -15,7 +15,6 @@ Currently we have one logger that logs to stdout and to a file in the log
 directory.
 ###
 bunyan = require 'bunyan'
-
 ###
 In order to have environment specific log files you will need to set NODE_ENV
 in your environment. You can see examples of how this is done in the scripts
@@ -110,10 +109,10 @@ if config.get('viewer')
     image_path = resolve_image_path(req.params.id)
     fs.stat image_path, (err, stats) ->
       if err
-        log.info {res: '404', url: url, ip: req.ip}, '404'
+        log.info {res: '404', url: req.url, ip: req.ip}, '404'
         res.status(404).send('404')
       else
-        log.info {res: 'viewer', url: url, ip: req.ip}, '400'
+        log.info {res: 'viewer', url: req.url, ip: req.ip}, '400'
         index = path.join __dirname, "/../app/index.html"
         res.setHeader('Content-Type', 'text/html')
         res.sendFile(index)
