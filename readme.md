@@ -1,6 +1,6 @@
 # IIIF Image Server in Node
 
-Simple example IIIF Image server written in Node to show the use of the `iiif-image` module.
+IIIF Image server written in Node using the `iiif-image` module.
 
 ## Compliance
 
