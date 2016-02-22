@@ -6,7 +6,7 @@ IIIF Image server written in Node using the [`iiif-image`](https://github.com/jr
 
 [IIIF Image API version 2.0](http://iiif.io/api/image/2.0/), [Level 1 compliant](http://iiif.io/api/image/2.0/compliance/).
 
-Some Level 2 features are available like rotationBy90s and png format responses.
+Some Level 2 features are available like regionByPct, rotationBy90s and png format responses.
 
 ## Requirements
 
