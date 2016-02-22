@@ -12,6 +12,7 @@ config = require 'config' # Configuration from config directory
 iiif = require 'iiif-image'
 Parser = iiif.ImageRequestParser
 Validator = iiif.Validator
+enrich_params = iiif.enrich_params
 
 # Helpers
 resolve_image_path = require('./resolver').resolve_image_path
@@ -69,6 +70,9 @@ image_response = (req, res) ->
           ###
           image_info = info_cache.get params.identifier
           valid_request = if image_info
+            # Since we have the image info we can enrich the params early on
+            # and use the information to check for a valid request.
+            params = enrich_params(params, image_info)
             validator = new Validator params, image_info
             validity = validator.valid()
             if validity
@@ -91,6 +95,6 @@ image_response = (req, res) ->
             image_extraction(req, res, params)
           else
             log.info {res: '400', url: url, ip: req.ip}, '400'
-            res.status(400).send('400 error')
+            res.status(400).send('400')
 
 module.exports = image_response
