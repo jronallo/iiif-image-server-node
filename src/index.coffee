@@ -170,6 +170,6 @@ app.get '*', (req, res) ->
 if require.main == module
   port = process.env.PORT || 3001
   app.listen port, () ->
-    console.log('Example IIIF image server listening on port 3001! Visit http://localhost:3001/viewer/trumpler14')
+    console.log("IIIF image server listening on port #{port}! Visit http://localhost:#{port}/viewer/trumpler14")
 
 exports.app = app
