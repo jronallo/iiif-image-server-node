@@ -64,6 +64,9 @@ Different keys tell you where in the code the log message comes from:
 - Cache info.json to the filesystem without expiration.
 - Ansible deploy scripts should set expires headers via nginx (or node?)
 - Can performance be improved if output of opj_decompress and kdu_expand is streamed through a socket? How would this work? http://stackoverflow.com/questions/11750041/how-to-create-a-named-pipe-in-node-js/18226566#18226566
+- When iiif-image supports extracting from other formats like TIF and JPEG:
+  - Resolver should be able to find/match these formats.
+  - Extractor should be selected dynamically. If JP2 then opj or kdu, otherwise just choose the sharp extractor.
 
 ## Kakadu Copyright Notice and Disclaimer
  We do not distribute the Kakadu executables. You will need to install the Kakadu binaries/executables available [here](http://kakadusoftware.com/downloads/). The executables available there are made available for demonstration purposes only. Neither the author, Dr. Taubman, nor UNSW Australia accept any liability arising from their use or re-distribution.
