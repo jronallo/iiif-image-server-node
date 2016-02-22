@@ -19,13 +19,13 @@ Informer = iiif.Informer(jp2_binary)
 Extractor = iiif.Extractor(jp2_binary)
 Validator = iiif.Validator
 path_for_image_cache_file = require './path-for-image-cache-file'
+too_big = require('./helpers').too_big
 
 ###
 This function needs the response object and the incoming URL to parse the URL,
 get information about the image, extract the requested image, and provide a
 response to the client.
 ###
-
 image_extraction = (req, res, params) ->
   url = req.url
   image_path = resolve_image_path(params.identifier)
@@ -72,7 +72,9 @@ image_extraction = (req, res, params) ->
       info_cache.set params.identifier, info
       log.info {cache: 'info', op: 'set', url: url, ip: req.ip}, 'info cached'
     validator = new Validator params, info
-    if validator.valid()
+    # Besides checking for validity we also check whether this request
+    # falls within the allowable size limits for the returned image.
+    if validator.valid() && !too_big(params, info)
       log.info {valid: true, test: 'info', url: url, ip: req.ip}, 'valid w/ info'
       # We create the options that the Extractor expects
       options =

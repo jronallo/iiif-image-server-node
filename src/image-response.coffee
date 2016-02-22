@@ -13,6 +13,7 @@ iiif = require 'iiif-image'
 Parser = iiif.ImageRequestParser
 Validator = iiif.Validator
 enrich_params = iiif.enrich_params
+too_big = require('./helpers').too_big
 
 # Helpers
 resolve_image_path = require('./resolver').resolve_image_path
@@ -74,7 +75,9 @@ image_response = (req, res) ->
             # and use the information to check for a valid request.
             params = enrich_params(params, image_info)
             validator = new Validator params, image_info
-            validity = validator.valid()
+            # Besides checking for validity we also check whether this request
+            # falls within the allowable size limits for the returned image.
+            validity = validator.valid() && !too_big(params, image_info)
             if validity
               log.info {valid: true, test: 'info', url: url, ip: req.ip}, 'valid w/ info'
             else
@@ -95,6 +98,6 @@ image_response = (req, res) ->
             image_extraction(req, res, params)
           else
             log.info {res: '400', url: url, ip: req.ip}, '400'
-            res.status(400).send('400')
+            res.status(400).send('400 invalid')
 
 module.exports = image_response

@@ -23,6 +23,20 @@ resolver:
   # path for resolving images.
   base_path: false
 
+# Do you want to allow images to be resized above the size of the extracted
+# region? You can change this factor to allow upscaling up to
+# upsize_factor * params.region.w
+# A value of 1 means that no upsizing will be allowed.
+# So an upsize_factor of 2 would allow extracted regions to be upsized to no
+# more than twice their size. This number is used to check the validity
+# of the incoming request and reject any requests for images that are too large.
+# Note that if you begin with a larger upsize_factor and then decrease this
+# number you may have to clear your image cache as with some settings
+# (cache.image.base_path == 'public') the image server code that checks for this
+# may never see the request as the web server might be serving static assets
+# directly out of the public directory.
+upsize_factor: 1
+
 # Should the routes for the openseadragon viewer be enabled?
 viewer: true
 
