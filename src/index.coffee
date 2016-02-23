@@ -168,7 +168,6 @@ app.get '*', (req, res) ->
       res.redirect '303', "/#{possible_image_identifier}/info.json"
 
 # if require.main == module
-# log.info require.main.filename
 unless process.env.NODE_ENV == 'test'
   port = process.env.PORT || 3001
   app.listen port, () ->
