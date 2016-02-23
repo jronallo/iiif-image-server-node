@@ -169,8 +169,9 @@ app.get '*', (req, res) ->
 
 # if require.main == module
 # log.info require.main.filename
-port = process.env.PORT || 3001
-app.listen port, () ->
-  console.log("IIIF image server listening on port #{port}! Visit http://localhost:#{port}/viewer/trumpler14")
+unless process.env.NODE_ENV == 'test'
+  port = process.env.PORT || 3001
+  app.listen port, () ->
+    console.log("IIIF image server listening on port #{port}! Visit http://localhost:#{port}/viewer/trumpler14")
 
 exports.app = app
