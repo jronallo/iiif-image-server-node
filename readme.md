@@ -14,6 +14,8 @@ Currently `iiif-image` only works with JPEG2000 images. In order to handle JP2 f
 
 `iiif-image` also relies on [sharp](http://sharp.dimens.io/en/stable/) for image processing which depends on libvips. Only OSX ought to need to install libvips.
 
+Non-standard features include region by "!square" (for top-left gravity) and "square!" (bottom-left gravity).
+
 ## Usage
 
 ```sh
@@ -62,6 +64,7 @@ Different keys tell you where in the code the log message comes from:
 `res`: What kind of response has been sent. Will either be "info", "image", "viewer", or a status code.
 
 ## TODO
+- Allow iiif-image profile documents to be used for image caching or cache cleanup decisions.
 - Cache info.json to the filesystem without expiration.
 - Ansible deploy scripts should set expires headers via nginx (or node?)
 - Can performance be improved if output of opj_decompress and kdu_expand is streamed through a socket? How would this work? http://stackoverflow.com/questions/11750041/how-to-create-a-named-pipe-in-node-js/18226566#18226566
