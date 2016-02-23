@@ -3,6 +3,8 @@ npm-debug*
 .bundle
 .vagrant
 scripts
+config/production*
+config/staging*
 
 log/*log
 

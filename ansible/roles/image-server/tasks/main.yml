@@ -18,5 +18,12 @@
 - name: npm install
   become: no
   shell: chdir={{app_deploy_path}} npm i
+- name: NODE_CONFIG_DIR for node-config
+  become: no
+  lineinfile:
+    dest: ~/.bashrc
+    line: export NODE_CONFIG_DIR={{app_deploy_path}}/config
+- name: install bunyan globally
+  shell: npm i -g bunyan
 - name: restart nginx
   service: name=nginx state=restarted

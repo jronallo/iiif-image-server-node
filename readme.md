@@ -45,6 +45,8 @@ The Ansible playbook and roles show how to get the server deployed to a CentOS 7
 
 Once everything is installed you can visit: <http://localhost:8088/viewer/trumpler14>
 
+If you use the "public" image cache one trick you can use is to make the public directory a symlink to where your cache lives to allow it to be persistent across deploys.
+
 ## Logging
 
 Currently everything is logged to ./log/iiif.log with [Bunyan](https://github.com/trentm/node-bunyan). Bunyan logs as JSON and comes with a command line tool to sort through log files and make them pretty for inspection.

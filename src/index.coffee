@@ -167,9 +167,10 @@ app.get '*', (req, res) ->
       log.info {res: '303', url: url, ip: req.ip}, '303'
       res.redirect '303', "/#{possible_image_identifier}/info.json"
 
-if require.main == module
-  port = process.env.PORT || 3001
-  app.listen port, () ->
-    console.log("IIIF image server listening on port #{port}! Visit http://localhost:#{port}/viewer/trumpler14")
+# if require.main == module
+# log.info require.main.filename
+port = process.env.PORT || 3001
+app.listen port, () ->
+  console.log("IIIF image server listening on port #{port}! Visit http://localhost:#{port}/viewer/trumpler14")
 
 exports.app = app
