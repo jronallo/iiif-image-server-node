@@ -3,11 +3,18 @@ npm-debug*
 .bundle
 .vagrant
 scripts
-config/production*
-config/staging*
+
+# image server config
+config/production.yml
+config/staging.yml
+
+# Capistrano
+config/deploy*
+Capfile
 
 log/*log
 
+# local test images we don't want to commit
 images/seg*
 images/hs*
 images/moon*
