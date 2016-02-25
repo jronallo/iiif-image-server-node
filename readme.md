@@ -51,11 +51,13 @@ If you use the "public" image cache one trick you can use is to make the public 
 
 ## Deployment
 
-Here is basically how I am deploying this project in case it is useful for anyone else. The ansible directory contains roles which should help give you some direction on how to automate deployment of the application. This is not a full recipe though since the code needs to be pushed to the remote server. I like to do this with Capistrano.
+Here is basically how I am deploying this project in case it is useful for anyone else. The ansible directory contains roles which should help give you some direction on how to automate deployment of the application on a CentOS or RHEL machine. This is not a full recipe though. In Vagrant the code is already linked into the VM--it is just there. For a staging or production deploy the code needs to be pushed to the remote server. I like to push code out with Capistrano.
 
-1. Get a server set up with Passenger and Nginx. This is basically done with the steps in ansible/roles/passenger-nginx-install
+This is too brief but hopefully gives some direction:
+
+1. Get a server set up with Passenger and Nginx. This is done with the steps in ansible/roles/passenger-nginx-install.
 2. Deploy the app with Capistrano and note the path of the deploy.
-3. Install the other dependencies that the image server depends on using the image-server role.
+3. Install the other dependencies for the image server using the image-server role.
 4. Configure Passenger and Nginx using the passenger-nginx-config role.
 
 TODO: Adjust the ansible roles for proven actual production deploy.
