@@ -28,15 +28,16 @@
     "tape": "^4.4.0"
   },
   "dependencies": {
-    "iiif-image": "0.0.12",
     "bunyan": "^1.6.0",
     "config": "^1.19.0",
     "express": "^4.13.4",
+    "iiif-image": "0.0.12",
     "js-yaml": "^3.5.3",
     "lodash": "^4.3.0",
     "mkdirp": "^0.5.1",
     "node-cache": "^3.1.0",
     "openseadragon": "^2.1.0",
+    "pairtree": "0.0.1",
     "tempfile": "^1.1.1"
   }
 }

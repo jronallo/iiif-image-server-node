@@ -28,8 +28,8 @@ resolver:
   # nested: Takes the nested_number number of characters off the front of the
   #         filename and uses that as the top level directory. This can be
   #         useful for partitioning your access derivative images.
-  # pairtree: Not yet implemented. Follows the Pairtree spec in splitting up
-  #           an identifier.
+  # pairtree: Follows the Pairtree spec in splitting up an identifier into
+  #           directories.
   type: simple
   # type: nested
   # nested_number: 2
