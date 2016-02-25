@@ -7,12 +7,13 @@
   gather_facts: yes
   vars:
     project_name: iiif-image-server
-    # These are used in the passenger-nginx role
+    # These are used in the passenger-nginx-config role
     app_deploy_path: /iiif-image-server
     passenger_startup_file: lib/index.js
 
   roles:
-    - role: passenger-nginx
+    - role: passenger-nginx-install
+    - role: passenger-nginx-config
     - role: image-server
 
   post_tasks:

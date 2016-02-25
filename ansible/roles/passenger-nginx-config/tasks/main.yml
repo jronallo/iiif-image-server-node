@@ -1,0 +1,13 @@
+---
+- name: passenger.conf
+  template:
+    src: passenger.conf
+    dest: /etc/nginx/conf.d/passenger.conf
+
+- name: nginx configuration file
+  template:
+    src: nginx.conf
+    dest: "/etc/nginx/conf.d/{{project_name}}-nginx.conf"
+
+- name: restart nginx
+  service: name=nginx state=started enabled=yes

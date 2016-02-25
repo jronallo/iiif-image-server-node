@@ -8,13 +8,16 @@
     - epel-release
     - pygpgme
     - curl
+
 - name: get nodejs repo
   get_url:
     url: https://rpm.nodesource.com/setup_5.x
     dest: ~/setup-nodejs
   # shell: curl --fail -sSL -o setup-nodejs https://rpm.nodesource.com/setup
+
 - name: setup nodejs
   shell: bash setup-nodejs chdir=~
+
 - name: install nodejs and dependencies
   yum:
     pkg: "{{item}}"
@@ -24,10 +27,12 @@
     - nodejs
     - gcc-c++
     - make
+
 - name: add passenger repository
   get_url:
     url: https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo
     dest: /etc/yum.repos.d/
+
 - name: install nginx and passenger
   yum:
     pkg: "{{item}}"
@@ -36,13 +41,3 @@
   with_items:
     - nginx
     - passenger
-- name: passenger.conf
-  template:
-    src: passenger.conf
-    dest: /etc/nginx/conf.d/passenger.conf
-- name: nginx configuration file
-  template:
-    src: nginx.conf
-    dest: "/etc/nginx/conf.d/{{project_name}}-nginx.conf"
-- name: restart nginx
-  service: name=nginx state=started enabled=yes

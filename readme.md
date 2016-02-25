@@ -39,7 +39,7 @@ In another terminal run `npm run watch` to restart the server on changes.
 
 Run the tests with `npm run watch_test` for test reloading or just `npm test` to run them once.
 
-## Vagrant and Server Deploys
+## Vagrant
 
 The Ansible playbook and roles show how to get the server deployed to a CentOS 7 machine. You can run them with:
 
@@ -48,6 +48,17 @@ The Ansible playbook and roles show how to get the server deployed to a CentOS 7
 Once everything is installed you can visit: <http://localhost:8088/viewer/trumpler14>
 
 If you use the "public" image cache one trick you can use is to make the public directory a symlink to where your cache lives to allow it to be persistent across deploys.
+
+## Deployment
+
+Here is basically how I am deploying this project in case it is useful for anyone else. The ansible directory contains roles which should help give you some direction on how to automate deployment of the application. This is not a full recipe though since the code needs to be pushed to the remote server. I like to do this with Capistrano.
+
+1. Get a server set up with Passenger and Nginx. This is basically done with the steps in ansible/roles/passenger-nginx-install
+2. Deploy the app with Capistrano and note the path of the deploy.
+3. Install the other dependencies that the image server depends on using the image-server role.
+4. Configure Passenger and Nginx using the passenger-nginx-config role.
+
+TODO: Adjust the ansible roles for proven actual production deploy.
 
 ## Logging
 
