@@ -22,6 +22,17 @@ resolver:
   # in this project will be used. Any other value ought to be the full base
   # path for resolving images.
   base_path: false
+  # Valid values for type include:
+  # simple: For using the full identifier name as the name of the file directly
+  #         underneath the base_path.
+  # nested: Takes the nested_number number of characters off the front of the
+  #         filename and uses that as the top level directory. This can be
+  #         useful for partitioning your access derivative images.
+  # pairtree: Not yet implemented. Follows the Pairtree spec in splitting up
+  #           an identifier.
+  type: simple
+  # type: nested
+  # nested_number: 2
 
 # Do you want to allow images to be resized above the size of the extracted
 # region? You can change this factor to allow upscaling up to
