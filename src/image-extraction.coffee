@@ -18,7 +18,7 @@ iiif = require 'iiif-image'
 Informer = iiif.Informer(jp2_binary)
 Extractor = iiif.Extractor(jp2_binary)
 Validator = iiif.Validator
-path_for_image_cache_file = require './path-for-image-cache-file'
+path_for_cache_file = require('./path-for-cache-file')
 too_big = require('./helpers').too_big
 
 ###
@@ -49,7 +49,7 @@ image_extraction = (req, res, params) ->
 
     # After we send the image we can cache it for a time.
     if !image_cache.get url
-      image_path = path_for_image_cache_file url
+      image_path = path_for_cache_file url
       dirname = path.dirname image_path
       mkdirp dirname, (err, made) ->
         if !err

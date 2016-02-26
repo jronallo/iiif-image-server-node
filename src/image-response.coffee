@@ -17,7 +17,7 @@ too_big = require('./helpers').too_big
 
 # Helpers
 resolve_image_path = require('./resolver').resolve_image_path
-path_for_image_cache_file = require './path-for-image-cache-file'
+path_for_cache_file = require('./path-for-cache-file')
 # TODO: Allow for selecting a custom implementation of image_extraction
 image_extraction = require('./image-extraction')
 
@@ -32,7 +32,7 @@ image_response = (req, res) ->
   file rather than relying on the memory cache to know whether this is an
   image_cache hit or not.
   ###
-  image_temp_file = path_for_image_cache_file(url)
+  image_temp_file = path_for_cache_file(url)
   fs.stat image_temp_file, (err, stats) ->
     if !err
       log.info {cache: 'image', found: 'hit', url: url, img: image_temp_file}

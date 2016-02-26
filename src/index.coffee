@@ -48,7 +48,10 @@ be faster than using a child process to return the information. This is
 completely in memory of the node instance so does not persist across instances
 or restarts.
 ###
-info_cache = new NodeCache()
+info_cache_ttl = config.get('cache.info.ttl')
+info_cache_checkperiod = config.get('cache.info.checkperiod')
+log.info {ttl: info_cache_ttl, checkperiod: info_cache_checkperiod}, 'info_cache settings'
+info_cache = new NodeCache stdTTL: info_cache_ttl, checkperiod: info_cache_checkperiod
 ###
 The image_cache is really only used for expiration of an image from
 the file system. This works fine for single process applications, but if you
@@ -93,10 +96,10 @@ resolve_image_path = require('./resolver').resolve_image_path
 
 ###
 Static assets in this case means cached image files when the
-config.cache.image.base_path value is 'public'. Otherwise the image server
+config.cache.base_path value is 'public'. Otherwise the image server
 has no need for serving up static assets. The
 ###
-if config.get('cache.image.base_path') == 'public'
+if config.get('cache.base_path') == 'public'
   log.info 'Use Express to serve static assets'
   app.use(express.static('public'))
 

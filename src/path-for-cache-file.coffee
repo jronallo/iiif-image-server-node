@@ -12,14 +12,16 @@ os = require 'os'
 log = require('./index').log
 config = require 'config'
 
-path_for_image_cache_file = (filepath) ->
-  base_path = config.get('cache.image.base_path')
+resolve_base_cache_path = ->
+  base_path = config.get('cache.base_path')
   base_path = if base_path == 'tmpdir'
     os.tmpdir()
   else if base_path == 'public'
     path.join __dirname, '/../public'
   else
     base_path
-  path.join base_path, filepath
 
-module.exports = path_for_image_cache_file
+path_for_cache_file = (filepath) ->
+  path.join resolve_base_cache_path(), filepath
+
+module.exports = path_for_cache_file

@@ -5,17 +5,19 @@
 
 jp2_binary: 'opj'
 cache:
+  # Options for base_path are:
+  # tmpdir: Use the system temporary directory
+  # public: Use the project's public directory. This can be useful for allowing
+  #         the web server, say behind Passenger, to serve up the image files
+  #         directly never hitting Node.
+  # Any other string will be treated like a directory path.
+  base_path: 'public'
   image:
     ttl: 86400
     checkperiod: 3600
-
-    # Options for base_path are:
-    # tmpdir: Use the system temporary directory
-    # public: Use the project's public directory. This can be useful for allowing
-    #         the web server, say behind Passenger, to serve up the image files
-    #         directly never hitting Node.
-    # Any other string will be treated like the
-    base_path: 'public'
+  info:
+    ttl: 86400
+    checkperiod: 3600
 
 resolver:
   # Source image resolver. If the base_path is falsey then the images directory

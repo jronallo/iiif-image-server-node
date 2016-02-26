@@ -1,5 +1,7 @@
 fs = require 'fs'
 _ = require 'lodash'
+path = require 'path'
+mkdirp = require 'mkdirp'
 
 log = require('./index').log
 info_cache = require('./index').info_cache
@@ -12,6 +14,7 @@ InfoJSONCreator = iiif.InfoJSONCreator
 Informer = iiif.Informer(jp2_binary)
 
 resolve_image_path = require('./resolver').resolve_image_path
+path_for_cache_file = require('./path-for-cache-file')
 
 info_json_response = (req, res) ->
   ###
@@ -45,9 +48,10 @@ info_json_response = (req, res) ->
       # Once we have the information from the image we can cache it if it is not
       # already cached and then create the information JSON response and send it.
       info_cb = (info) ->
+        # First we cache the info in memory since it might get used again soon.
         if !info_cache.get(id)
           info_cache.set id, info
-          log.info {cache: 'info', op: 'set', url: req.url, ip: req.ip}, 'image cached'
+          log.info {cache: 'info', op: 'set', url: url, ip: req.ip}, 'info cached'
         info_json_creator = new InfoJSONCreator info, server_info
         # If the request asks for ld+json we return with the
         # same content-type. Otherwise we can just return
@@ -55,7 +59,21 @@ info_json_response = (req, res) ->
         if req.get('Accept') && req.get('Accept').match /application\/ld\+json/
           res.set('Content-Type', 'application/ld+json')
         log.info {res: 'info', url: url, ip: req.ip}, 'response info'
-        res.send info_json_creator.info_json
+        info_json = info_json_creator.info_json
+        res.send info_json
+        console.log info_json
+        info_json_path = path_for_cache_file url
+        info_json_dir = path.dirname info_json_path
+        mkdirp info_json_dir, (err) ->
+          if !err
+            info_json_file = JSON.stringify info_json
+            console.log info_json_path
+            fs.writeFile info_json_path, info_json_file, (err) ->
+              if !err
+                log.info {cache: 'info.json', op: 'write', url: url, ip: req.ip}, 'info.json cached'
+              else
+                console.log err
+
 
       # If the information is already in the cache we do not have to inspect the
       # image again.
