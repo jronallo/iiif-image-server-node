@@ -78,7 +78,6 @@ Different keys tell you where in the code the log message comes from:
 
 ## TODO
 - Allow iiif-image profile documents to be used for image caching or cache cleanup decisions.
-- Cache info.json to the filesystem without expiration.
 - Ansible deploy scripts should set expires headers via nginx (or node?)
 - Can performance be improved if output of opj_decompress and kdu_expand is streamed through a socket? How would this work? http://stackoverflow.com/questions/11750041/how-to-create-a-named-pipe-in-node-js/18226566#18226566
 - When iiif-image supports extracting from other formats like TIF and JPEG:

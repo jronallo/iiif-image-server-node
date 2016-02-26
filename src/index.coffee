@@ -140,7 +140,7 @@ app.get '*info.json', (req, res) ->
   log.info {route: 'info.json', url: req.url, ip: req.ip}
   # Set CORS header
   if config.get 'cors'
-    res.header "Access-Control-Allow-Origin", config.get 'cors'
+    res.header "Access-Control-Allow-Origin", config.get('cors')
   info_json_response(req, res, info_cache)
 
 # The actual image server.
