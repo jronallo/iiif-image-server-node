@@ -33,6 +33,12 @@ See the config directory in the default.yml file for notes on settings.
 
 See [node-config](https://github.com/lorenwest/node-config) for how to override the defaults for different environments. Note that for the most part all settings must be present, though for a particular environment you only have to include the differences from the default.
 
+## Cleaning the File Cache
+
+TODO: Work in progress
+
+`clean_iiif_cache` can be used to clean the file cache of old, unused image files. It uses the file's atime to determine whether to delete the file or not. Caches a file for longer periods of time if it is in an image profile of frequently used images. See the `iiif` CLI that [`iiif-image`](https://github.com/jronallo/iiif-image) provides for how the same image profile can be used to warm the cache.
+
 ## Development
 
 In one terminal run `npm run compile` to compile the Coffeescript.

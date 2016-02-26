@@ -11,15 +11,8 @@ path = require 'path'
 os = require 'os'
 log = require('./index').log
 config = require 'config'
+resolve_base_cache_path = require './resolve-base-cache-path'
 
-resolve_base_cache_path = ->
-  base_path = config.get('cache.base_path')
-  base_path = if base_path == 'tmpdir'
-    os.tmpdir()
-  else if base_path == 'public'
-    path.join __dirname, '/../public'
-  else
-    base_path
 
 path_for_cache_file = (filepath) ->
   path.join resolve_base_cache_path(), filepath
