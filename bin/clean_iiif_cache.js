@@ -30,10 +30,6 @@ if (program.verbose) {
   console.log(config);
 }
 
-image_files = find(resolve_base_cache_path()).filter(function(file) {
-  return file.match(/.*\.(jpg|png)$/);
-});
-
 profile = yaml.safeLoad(fs.readFileSync(program.profile, 'utf8'));
 
 profiles = _.values(profile);
@@ -49,6 +45,10 @@ one_day = 1000 * 60 * 60 * 24;
 time_difference_profile_image = one_day * 30;
 
 time_difference_random_image = one_day;
+
+image_files = find(resolve_base_cache_path()).filter(function(file) {
+  return file.match(/.*\.(jpg|png)$/);
+});
 
 for (i = 0, len = image_files.length; i < len; i++) {
   image = image_files[i];
