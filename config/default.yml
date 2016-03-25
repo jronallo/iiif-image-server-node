@@ -3,6 +3,10 @@
 # kdu => Kakadu => kdu_jp2info and kdu_expand
 # opj => OpenJPEG => opj_dump and opj_decompress
 
+# Should URIs use a prefix? Use a blank string for no prefix.
+prefix: ''
+# prefix: 'iiif'
+
 jp2_binary: 'opj'
 cache:
   # Options for base_path are:

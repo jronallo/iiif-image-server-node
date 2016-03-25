@@ -1,9 +1,10 @@
 document.addEventListener("DOMContentLoaded", function(event) {
-  var image_id, loc, osd_config, viewer;
+  var image_id, loc, loc_split, osd_config, viewer;
 
   loc = window.location.toString();
-  image_id = loc.split('/').pop();
-  console.log("image_id: "+image_id);
+  loc_split = loc.split('/')
+  loc_split.pop();
+  image_id = loc_split.pop();
   osd_config = {
     id: 'openseadragon',
     prefixUrl: '../openseadragon/images/',
@@ -20,8 +21,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
     ],
     tileSources: []
   };
+
   server_url = window.location.protocol+'//'+window.location.hostname+(window.location.port ? ':'+window.location.port: '');
-  full_url = server_url +'/'+ (encodeURIComponent(image_id)) + "/info.json";
+
+  // FIXME: This only works when the prefix is 'iiif'
+  if (window.location.pathname.match(/^\/iiif\//)) {
+    prefix = 'iiif/'
+  } else {
+    prefix = ''
+  }
+  full_url = server_url +'/'+ prefix + (encodeURIComponent(image_id)) + "/info.json";
+
   osd_config['tileSources'].push(full_url);
   return viewer = OpenSeadragon(osd_config);
 });

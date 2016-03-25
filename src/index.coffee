@@ -105,9 +105,26 @@ if config.get('cache.base_path') == 'public'
 
 # Configuration allows the openseadragon viewer to be turned off.
 if config.get('viewer')
+  # Javascript from openseadragon
+  app.get '*/openseadragon.js', (req, res) ->
+    osdjs = path.join __dirname, '/../node_modules/openseadragon/build/openseadragon/openseadragon.js'
+    res.sendFile(osdjs)
+
+  # openseadragon control images
+  app.get '*/openseadragon/images/:image', (req, res) ->
+    osdf = path.join __dirname, "/../node_modules/openseadragon/build/openseadragon/images/#{req.params.image}"
+    res.sendFile osdf
+
+  # Our JavaScript to start up the openseadragon viewer.
+  app.get '*/openseadragon-start.js', (req, res) ->
+    osds = path.join __dirname, "/../app/openseadragon-start.js"
+    res.sendFile(osds)
+
+  # FIXME: remove: prefix = path.join '/', config.get('prefix')
   # Serve a web page for an openseadragon viewer.
   # http://localhost:3000/index.html?id=trumpler14
-  app.get '/viewer/:id/', (req, res) ->
+  viewer_path = path.join '/', config.get('prefix'), '/viewer/:id/'
+  app.get viewer_path, (req, res) ->
     log.info {route: 'viewer', url: req.url, ip: req.ip}
     image_path = resolve_image_path(req.params.id)
     fs.stat image_path, (err, stats) ->
@@ -119,21 +136,6 @@ if config.get('viewer')
         index = path.join __dirname, "/../app/index.html"
         res.setHeader('Content-Type', 'text/html')
         res.sendFile(index)
-
-  # Javascript from openseadragon
-  app.get '/openseadragon.js', (req, res) ->
-    osdjs = path.join __dirname, '/../node_modules/openseadragon/build/openseadragon/openseadragon.js'
-    res.sendFile(osdjs)
-
-  # openseadragon control images
-  app.get '/openseadragon/images/:image', (req, res) ->
-    osdf = path.join __dirname, "/../node_modules/openseadragon/build/openseadragon/images/#{req.params.image}"
-    res.sendFile osdf
-
-  # Our JavaScript to start up the openseadragon viewer.
-  app.get '/openseadragon-start.js', (req, res) ->
-    osds = path.join __dirname, "/../app/openseadragon-start.js"
-    res.sendFile(osds)
 
 # Respond to a IIIF Image Information Request with JSON
 app.get '*info.json', (req, res) ->

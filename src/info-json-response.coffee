@@ -41,8 +41,10 @@ info_json_response = (req, res) ->
       # In order to create an IIIF information response we need just a little more
       # data from the server than the Informer already provides for the images.
       scheme = if req.connection.encrypted? then 'https' else 'http'
+      info_id = path.join "#{req.headers.host}", config.get('prefix'), id
+      server_info_id = "#{scheme}://#{info_id}"
       server_info =
-        id: "#{scheme}://#{req.headers.host}/#{id}"
+        id: server_info_id
         level: 1
 
       # Once we have the information from the image we can cache it if it is not
