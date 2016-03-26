@@ -9,6 +9,26 @@ require 'shelljs/global' # for find
 fs = require 'fs'
 yaml = require 'js-yaml'
 _ = require 'lodash'
+path = require 'path'
+bunyan = require 'bunyan'
+
+log_file_path = path.join __dirname, "../log/clean_iiif_cache-#{process.env.NODE_ENV}.log"
+log = bunyan.createLogger {
+  name: 'clean_iiif_cache'
+  streams: [
+    {
+      level: 'debug',
+      stream: process.stdout
+    },
+    {
+      level: 'debug'
+      path: log_file_path
+    }
+  ]
+}
+
+
+# loads configuration file
 config = require 'config'
 # TODO: Use Bunyan logging in verbose mode.
 
@@ -43,7 +63,7 @@ regex = new RegExp profile_string
 # Set up dates for comparison.
 now = new Date()
 time_difference_profile_image = config.get('cache.clean.profile_image')
-time_difference_random_image = config.get('cache.clean.profile_image')
+time_difference_random_image = config.get('cache.clean.random_image')
 
 # find all files that are jpg or png but filter out any that match
 # the paths we want to stay around as they're frequently used and
@@ -67,9 +87,9 @@ for image in image_files
         # the image since it obviously isn't getting used that much.
         if now - stats.atime > time_difference_profile_image
           rm image
-          console.log "match delete: #{image}" if program.verbose
+          log.info {match: true, delete: true, image: image}, 'match delete'
         else # Keep the file around which will be the most common case.
-          console.log "match keep: #{image}" if program.verbose
+          log.info {match: true, delete: false, image: image}, 'match keep'
   # If there isn't a match
   else
     # TODO: Compare the atime to now. If it has not been
@@ -77,7 +97,7 @@ for image in image_files
     do (image) -> # Create a closure to do correct work even after another iteration
       fs.stat image, (err, stats) ->
         if now - stats.atime > time_difference_random_image
-          console.log "old: #{image}" if program.verbose
+          log.info {match: false, delete: true, image: image}, 'rand delete'
           rm image
         else
-          console.log "current: #{image}" if program.verbose
+          log.info {match: false, delete: false, image: image}, 'rand keep'

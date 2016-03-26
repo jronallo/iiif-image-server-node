@@ -7,6 +7,7 @@ scripts
 # image server config
 config/production.yml
 config/staging.yml
+config/development.yml
 
 # Capistrano
 config/deploy*
