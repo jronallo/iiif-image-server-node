@@ -3,9 +3,7 @@
 ###
 Script for clearing the cache that tries to retain the images that are specified
 in a profile. These may be images important for performance or that are
-frequently requested.
-Uses atime which
-Currently hard codes
+frequently requested. Uses atime to determine the last accessed time.
 ###
 require 'shelljs/global' # for find
 fs = require 'fs'
@@ -44,12 +42,8 @@ regex = new RegExp profile_string
 
 # Set up dates for comparison.
 now = new Date()
-# TODO: rework this so that folks can choose their own time durations for each
-# kind of cache clearing.
-one_day=1000*60*60*24 # milliseconds*seconds*minutes*hours
-# one_day=5000 # for testing
-time_difference_profile_image = one_day * config.get('cache.clean.profile_image')
-time_difference_random_image = one_day * config.get('cache.clean.profile_image')
+time_difference_profile_image = config.get('cache.clean.profile_image')
+time_difference_random_image = config.get('cache.clean.profile_image')
 
 # find all files that are jpg or png but filter out any that match
 # the paths we want to stay around as they're frequently used and

@@ -1,6 +1,6 @@
 {
   "name": "iiif-image-server-node",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "An example image server using the iiif-image module",
   "main": "lib/index.js",
   "bin": {
@@ -35,7 +35,7 @@
     "bunyan": "^1.6.0",
     "config": "^1.19.0",
     "express": "^4.13.4",
-    "iiif-image": "0.0.18",
+    "iiif-image": "0.0.19",
     "js-yaml": "^3.5.3",
     "lodash": "^4.3.0",
     "mkdirp": "^0.5.1",

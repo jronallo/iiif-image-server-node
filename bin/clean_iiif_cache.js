@@ -4,11 +4,9 @@
 /*
 Script for clearing the cache that tries to retain the images that are specified
 in a profile. These may be images important for performance or that are
-frequently requested.
-Uses atime which
-Currently hard codes
+frequently requested. Uses atime to determine the last accessed time.
  */
-var _, config, fs, i, image, image_files, len, match, now, one_day, profile, profile_string, profiles, program, regex, resolve_base_cache_path, time_difference_profile_image, time_difference_random_image, yaml;
+var _, config, fs, i, image, image_files, len, match, now, profile, profile_string, profiles, program, regex, resolve_base_cache_path, time_difference_profile_image, time_difference_random_image, yaml;
 
 require('shelljs/global');
 
@@ -46,11 +44,9 @@ regex = new RegExp(profile_string);
 
 now = new Date();
 
-one_day = 1000 * 60 * 60 * 24;
+time_difference_profile_image = config.get('cache.clean.profile_image');
 
-time_difference_profile_image = one_day * config.get('cache.clean.profile_image');
-
-time_difference_random_image = one_day * config.get('cache.clean.profile_image');
+time_difference_random_image = config.get('cache.clean.profile_image');
 
 image_files = find(resolve_base_cache_path()).filter(function(file) {
   return file.match(/.*\.(jpg|png)$/);
