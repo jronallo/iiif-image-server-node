@@ -8,7 +8,6 @@ path = require 'path'
 # exported from main
 log = require('./index').log
 info_cache = require('./index').info_cache
-image_cache = require('./index').image_cache
 
 # configuration from the config directory
 config = require 'config'
@@ -47,16 +46,15 @@ image_extraction = (req, res, params) ->
     log.info {res: 'image', url: url, ip: req.ip}, 'response image'
     res.send image
 
-    # After we send the image we can cache it for a time.
-    if !image_cache.get url
-      image_path = path_for_cache_file url
-      dirname = path.dirname image_path
-      mkdirp dirname, (err, made) ->
-        if !err
-          fs.writeFile image_path, image, (err) ->
-            if !err
-              image_cache.set url, image_path
-              log.info {cache: 'image', op: 'set', img: image_path, url: url}, 'image cached'
+    # After we send the image we can cache it. Assume if we get to this point
+    # that the file did not already exist? TODO: check if this is a fine assumption.
+    image_path = path_for_cache_file url
+    dirname = path.dirname image_path
+    mkdirp dirname, (err, made) ->
+      if !err
+        fs.writeFile image_path, image, (err) ->
+          if !err
+            log.info {cache: 'image', op: 'set', img: image_path, url: url}, 'image cached'
 
   ###
   Once the informer finishes its work it calls this callback sending it the

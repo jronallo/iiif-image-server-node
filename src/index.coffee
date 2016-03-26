@@ -52,33 +52,11 @@ info_cache_ttl = config.get('cache.info.ttl')
 info_cache_checkperiod = config.get('cache.info.checkperiod')
 log.info {ttl: info_cache_ttl, checkperiod: info_cache_checkperiod}, 'info_cache settings'
 info_cache = new NodeCache stdTTL: info_cache_ttl, checkperiod: info_cache_checkperiod
-###
-The image_cache is really only used for expiration of an image from
-the file system. This works fine for single process applications, but if you
-begin to scale out to multiple processes then you will want to use a shared
-cache like Memcached.
-###
-image_cache_ttl = config.get('cache.image.ttl')
-image_cache_checkperiod = config.get('cache.image.checkperiod')
-log.info {ttl: image_cache_ttl, checkperiod: image_cache_checkperiod}, 'image_cache settings'
-
-# Create the image_cache
-image_cache = new NodeCache stdTTL: image_cache_ttl, checkperiod: image_cache_checkperiod
-
-###
-When an image gets deleted or expired from the cache unlink the cached file.
-###
-image_cache.on 'del', (key, cached_image_path) ->
-  log.info {cache: 'image', op: 'del', key: key, img: cached_image_path}, "image deleted"
-  fs.unlink cached_image_path, (err) ->
-    # Do nothing since we have already achieved our goal to remove the file.
-    return
 
 ###
 Exports
 ###
 exports.log = log
-exports.image_cache = image_cache
 exports.info_cache = info_cache
 
 ###
@@ -149,7 +127,7 @@ app.get '*info.json', (req, res) ->
 # This image server will only accept requests for jpg and png images.
 app.get '*default.:format(jpg|png)', (req, res) ->
   log.info {route: 'image', url: req.url, ip: req.ip}
-  image_response(req, res, info_cache, image_cache)
+  image_response(req, res, info_cache)
 
 # Catch all other requests. In some cases this will be a
 # request with an image identifier in which case we

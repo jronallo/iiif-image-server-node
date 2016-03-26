@@ -8,7 +8,7 @@ IIIF Image server written in Node using the [`iiif-image`](https://github.com/jr
 
 Most Level 2 features are available. Additional features supported include "square" regions and the non-standard "!square" and "square!" regions which add a left-top or bottom-right gravity respectively. See [`iiif-image`](https://github.com/jronallo/iiif-image) for more information.
 
-[Validation tests](http://iiif.io/api/image/validator/results/?server=http%3A%2F%2Fiiif.lib.ncsu.edu&prefix=&identifier=67352ccc-d1b0-11e1-89ae-279075081939&version=2.0&level=2&id_squares=on&info_json=on&id_basic=on&id_error_escapedslash=on&id_error_unescaped=on&id_escaped=on&id_error_random=on&region_error_random=on&region_pixels=on&region_percent=on&size_region=on&size_error_random=on&size_ch=on&size_wc=on&size_percent=on&size_bwh=on&size_wh=on&rot_error_random=on&rot_region_basic=on&rot_full_basic=on&quality_error_random=on&quality_color=on&quality_bitonal=on&quality_grey=on&format_jpg=on&format_error_random=on&format_png=on&jsonld=on&baseurl_redirect=on&cors=on) that do not pass include setting a JSON-LD media type but only under certain caching circumstances. [See this discussion](https://groups.google.com/forum/#!topic/iiif-discuss/NuDHEgEbzo0) on the list about content types. This server only supports the "default" quality. If you need support for "color", "gray", and "bitonal" qualities, let me know.
+[Validation tests](http://iiif.io/api/image/validator/results/?server=http%3A%2F%2Fiiif.lib.ncsu.edu&prefix=iiif&identifier=67352ccc-d1b0-11e1-89ae-279075081939&version=2.0&level=2&id_squares=on&info_json=on&id_basic=on&id_error_escapedslash=on&id_error_unescaped=on&id_escaped=on&id_error_random=on&region_error_random=on&region_pixels=on&region_percent=on&size_region=on&size_error_random=on&size_ch=on&size_wc=on&size_percent=on&size_bwh=on&size_wh=on&rot_error_random=on&rot_region_basic=on&rot_full_basic=on&quality_error_random=on&quality_color=on&quality_bitonal=on&quality_grey=on&format_jpg=on&format_error_random=on&format_png=on&jsonld=on&baseurl_redirect=on&cors=on) that do not pass include setting a JSON-LD media type but only under certain caching circumstances. [See this discussion](https://groups.google.com/forum/#!topic/iiif-discuss/NuDHEgEbzo0) on the list about content types. This server only supports the "default" quality. If you need support for "color", "gray", and "bitonal" qualities, let me know.
 
 ## Requirements
 
@@ -37,7 +37,11 @@ See [node-config](https://github.com/lorenwest/node-config) for how to override 
 
 TODO: Work in progress
 
-`clean_iiif_cache` can be used to clean the file cache of old, unused image files. It uses the file's atime to determine whether to delete the file or not. Caches a file for longer periods of time if it is in an image profile of frequently used images. See the `iiif` CLI that [`iiif-image`](https://github.com/jronallo/iiif-image) provides for how the same image profile can be used to warm the cache.
+`clean_iiif_cache.js` can be used to clean the file cache of old, unused image files. It uses the file's atime to determine whether to delete the file or not. Caches a file for longer periods of time if it is in an image profile of frequently used image sizes in your application. See the `iiif` CLI that [`iiif-image`](https://github.com/jronallo/iiif-image) provides for what an profile looks like and how the same image profile can be used to warm the cache.
+
+After running `clean_iiif_cache.js` you may also want to run something like the following to clear out empty directories from your cache: `find /path/to/cache/directory/ -type d -empty -delete`
+
+Both of these can be placed in a cron job. `clean_iiif_cache.js` is currently written to be run 
 
 ## Development
 

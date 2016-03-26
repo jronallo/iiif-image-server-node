@@ -24,15 +24,21 @@ resolve_base_cache_path = require('../lib/resolve-base-cache-path');
 
 program = require('commander');
 
-program.version('0.0.0').usage('-p ../iiif-image/config/profile.yml').option('-p, --profile [value]', 'Directory to image profile document').option('-v, --verbose', 'Verbose').parse(process.argv);
+program.version('0.0.0').usage('--profile ../iiif-image/config/profile.yml').option('-p, --profile [value]', 'Directory to image profile document').option('-v, --verbose', 'Verbose').parse(process.argv);
 
 if (program.verbose) {
   console.log(config);
 }
 
+if (!program.profile) {
+  console.log("\nYou must specify a profile YAML document determine what to clean out!\nSee the documentation for iiif-image for how to create a profile.");
+  program.outputHelp();
+  process.exit();
+}
+
 profile = yaml.safeLoad(fs.readFileSync(program.profile, 'utf8'));
 
-profiles = _.values(profile);
+profiles = _.values(profile['urls']);
 
 profile_string = profiles.join('$|') + "$";
 
@@ -42,9 +48,9 @@ now = new Date();
 
 one_day = 1000 * 60 * 60 * 24;
 
-time_difference_profile_image = one_day * 30;
+time_difference_profile_image = one_day * config.get('cache.clean.profile_image');
 
-time_difference_random_image = one_day;
+time_difference_random_image = one_day * config.get('cache.clean.profile_image');
 
 image_files = find(resolve_base_cache_path()).filter(function(file) {
   return file.match(/.*\.(jpg|png)$/);

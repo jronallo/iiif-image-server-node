@@ -3,7 +3,6 @@ fs = require 'fs' # Used to test presence of files
 # exported from main
 log = require('./index').log
 info_cache = require('./index').info_cache
-image_cache = require('./index').image_cache
 
 config = require 'config' # Configuration from config directory
 
@@ -27,17 +26,12 @@ image_response = (req, res) ->
   url = req.url
   ###
   If the image exists just serve that up. This allows cached images
-  to be used across instances of the application, but will still not handle
-  cache expiration in a unified way. This is why we check for the status of the
-  file rather than relying on the memory cache to know whether this is an
-  image_cache hit or not.
+  to be used across instances of the application.
   ###
   image_temp_file = path_for_cache_file(url)
   fs.stat image_temp_file, (err, stats) ->
     if !err
       log.info {cache: 'image', found: 'hit', url: url, img: image_temp_file}
-      # Since this is a cache hit expand the time to live in the cache.
-      image_cache.ttl url, ttl
       log.info {res: 'image', url: url, ip: req.ip}, 'response image'
       res.sendFile image_temp_file
     else

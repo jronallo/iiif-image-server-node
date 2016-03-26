@@ -22,6 +22,21 @@ cache:
   info:
     ttl: 86400
     checkperiod: 3600
+  # Options for cleaning the cache with the clean_iiif_cache script that uses
+  # a iiif-image profile.yml document to determine which files to clean out.
+  # There are two different time differences both measured in days.
+  clean:
+    # profile_image: Number of days old a profile image needs to be before it
+    # is cleaned from the cache. Since the profile images are intended to be
+    # for commonly used images in your application you may want to set this
+    # to a relatively high number, but can lower it if you need to reclaim
+    # cache storage space more aggressively.
+    profile_image: 30
+    # random_image: This is the setting for images that are not in your profile
+    # so images that are not commonly used in your application. These could be
+    # tile images from your pan/zoom viewer or images from an old profile. Set
+    # this number to as high as you can while not exceeding your storage space.
+    random_image: 1
 
 resolver:
   # Source image resolver. If the base_path is falsey then the images directory
