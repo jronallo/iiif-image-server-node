@@ -38,25 +38,22 @@ resolve_base_cache_path = require '../lib/resolve-base-cache-path'
 program = require 'commander'
 program
   .version '0.0.0'
-  .usage '--profile ../iiif-image/config/profile.yml'
-  .option '-p, --profile [value]', 'Directory to image profile document'
   .option '-v, --verbose', 'Verbose'
   .parse process.argv
 
 console.log config if program.verbose
 
-if !program.profile
+if !config.get('profile')
   console.log """
 
-    You must specify a profile YAML document determine what to clean out!
-    See the documentation for iiif-image for how to create a profile.
+    You must specify a profile in your config file to determine what to clean out!
+    See the documentation in config/default.yml for how to create a profile.
   """
   program.outputHelp()
   process.exit()
 
 # Load the profile and create a regex that can be used to match the profile.
-profile = yaml.safeLoad(fs.readFileSync(program.profile, 'utf8'))
-profiles =  _.values(profile['urls'])
+profiles =  _.values(config.get('profile'))
 profile_string = profiles.join('$|') + "$"
 regex = new RegExp profile_string
 

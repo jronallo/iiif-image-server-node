@@ -1,13 +1,21 @@
+# Do your IIIF URIs use a prefix? Use a blank string for no prefix.
+prefix: ''
+# prefix: 'iiif'
+
 # Choose which JP2 binaries to use.
 # These binaries must be in the PATH of the user who runs the image server.
 # kdu => Kakadu => kdu_jp2info and kdu_expand
 # opj => OpenJPEG => opj_dump and opj_decompress
-
-# Should URIs use a prefix? Use a blank string for no prefix.
-prefix: ''
-# prefix: 'iiif'
-
 jp2_binary: 'opj'
+
+# Provide a profile of the IIIF URLs that you want to warm the cache with and
+# keep in the cache for longer than random images. See cache.clean below.
+# The keys are meant for humans and aren't used.
+profile:
+  search_index_page: /square/300,/0/default.jpg
+  index_show_view:   /full/600,/0/default.jpg
+  mini_thumbnail:    /square/75,/0/default.png
+
 cache:
   # Options for base_path are:
   # tmpdir: Use the system temporary directory
@@ -24,7 +32,7 @@ cache:
     checkperiod: 3600
 
   # Options for cleaning the cache with the clean_iiif_cache script which uses
-  # a iiif-image profile.yml document to determine which files to clean out.
+  # profile above to determine which files to clean out.
   # There are two different time differences both measured in days.
   clean:
     # profile_image: Number of milliseconds old a profile image needs to be
