@@ -101,7 +101,7 @@ if config.get('viewer')
   # FIXME: remove: prefix = path.join '/', config.get('prefix')
   # Serve a web page for an openseadragon viewer.
   # http://localhost:3000/index.html?id=trumpler14
-  viewer_path = path.join '/', config.get('prefix'), '/viewer/:id/'
+  viewer_path = path.join '/', config.get('prefix'), '/viewer/:id/?$'
   app.get viewer_path, (req, res) ->
     log.info {route: 'viewer', url: req.url, ip: req.ip}
     image_path = resolve_image_path(req.params.id)

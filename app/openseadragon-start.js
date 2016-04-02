@@ -2,8 +2,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var image_id, loc, loc_split, osd_config, viewer;
 
   loc = window.location.toString();
-  loc_split = loc.split('/')
-  loc_split.pop();
+  loc_split = loc.split('/');
+  // If there is a trailing slash then pop off the last trailing empty string
+  // after the split.
+  if (loc.lastIndexOf('/') === loc.length - 1) {
+    loc_split.pop();
+  }
   image_id = loc_split.pop();
   osd_config = {
     id: 'openseadragon',
