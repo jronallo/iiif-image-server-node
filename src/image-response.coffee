@@ -15,7 +15,7 @@ enrich_params = iiif.enrich_params
 too_big = require('./helpers').too_big
 
 # Helpers
-resolve_image_path = require('./resolver').resolve_image_path
+resolve_source_image_path = require('./resolver').resolve_source_image_path
 path_for_cache_file = require('./path-for-cache-file')
 # TODO: Allow for selecting a custom implementation of image_extraction
 image_extraction = require('./image-extraction')
@@ -28,14 +28,14 @@ image_response = (req, res) ->
   If the image exists just serve that up. This allows cached images
   to be used across instances of the application.
   ###
-  image_temp_file = path_for_cache_file(url)
-  fs.stat image_temp_file, (err, stats) ->
+  image_file = path_for_cache_file(url)
+  fs.stat image_file, (err, stats) ->
     if !err
-      log.info {cache: 'image', found: 'hit', url: url, img: image_temp_file}
+      log.info {cache: 'image', found: 'hit', url: url, img: image_file}
       log.info {res: 'image', url: url, ip: req.ip}, 'response image'
-      res.sendFile image_temp_file
+      res.sendFile image_file
     else
-      log.info {cache: 'image', found: 'miss', url: url, img: image_temp_file}
+      log.info {cache: 'image', found: 'miss', url: url, img: image_file}
 
       ###
       First we parse the URL to extract all the information we'll need from the
@@ -43,12 +43,12 @@ image_response = (req, res) ->
       ###
       parser = new Parser url
       params = parser.parse()
-      image_path = resolve_image_path(params.identifier)
+      source_image_path = resolve_source_image_path(params.identifier)
 
       ###
       Check to see if the source image exists. If not return a 404.
       ###
-      fs.stat image_path, (err, stats) ->
+      fs.stat source_image_path, (err, stats) ->
         if err
           log.info {res: '404', url: url, ip: req.ip}, '404'
           res.status(404).send('404')
@@ -63,6 +63,10 @@ image_response = (req, res) ->
           info_cache (say when we've already responded to an info.json request)
           we do a fuller validation of the request (is it in bounds?).
           ###
+
+          # TODO: If the info.json is not in the info_cache then look on the
+          #       file system for the info.json!!!
+
           image_info = info_cache.get params.identifier
           valid_request = if image_info
             # Since we have the image info we can enrich the params early on

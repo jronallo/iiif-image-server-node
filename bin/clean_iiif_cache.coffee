@@ -53,7 +53,7 @@ if !config.get('profile')
   process.exit()
 
 # Load the profile and create a regex that can be used to match the profile.
-profiles =  _.values(config.get('profile'))
+profiles = _.values(config.get('profile'))
 profile_string = profiles.join('$|') + "$"
 regex = new RegExp profile_string
 

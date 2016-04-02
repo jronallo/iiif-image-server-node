@@ -70,7 +70,8 @@ log etc. will be undefined within the modules.
 info_json_response = require './info-json-response'
 # TODO: Allow for selecting a custom implementation for image response
 image_response = require './image-response'
-resolve_image_path = require('./resolver').resolve_image_path
+resolve_source_image_path = require('./resolver').resolve_source_image_path
+warm_cache = require('./warm-cache')
 
 ###
 Static assets in this case means cached image files when the
@@ -104,8 +105,8 @@ if config.get('viewer')
   viewer_path = path.join '/', config.get('prefix'), '/viewer/:id/?$'
   app.get viewer_path, (req, res) ->
     log.info {route: 'viewer', url: req.url, ip: req.ip}
-    image_path = resolve_image_path(req.params.id)
-    fs.stat image_path, (err, stats) ->
+    source_image_path = resolve_source_image_path(req.params.id)
+    fs.stat source_image_path, (err, stats) ->
       if err
         log.info {res: '404', url: req.url, ip: req.ip}, '404'
         res.status(404).send('404')
@@ -115,8 +116,15 @@ if config.get('viewer')
         res.setHeader('Content-Type', 'text/html')
         res.sendFile(index)
 
+if config.get('profile')
+  warm_path = path.join '/', config.get('prefix'), '/warm/:id/?$'
+  app.get warm_path, (req, res) ->
+    log.info {route: 'warm', url: req.url, ip: req.ip}
+    warm_cache(req, res)
+
 # Respond to a IIIF Image Information Request with JSON
-app.get '*info.json', (req, res) ->
+info_json_path = path.join '/', config.get('prefix'), '/:id/info.json'
+app.get info_json_path, (req, res) ->
   log.info {route: 'info.json', url: req.url, ip: req.ip}
   # Set CORS header
   if config.get 'cors'
@@ -125,7 +133,8 @@ app.get '*info.json', (req, res) ->
 
 # The actual image server.
 # This image server will only accept requests for jpg and png images.
-app.get '*default.:format(jpg|png)', (req, res) ->
+default_image_path = path.join '/', config.get('prefix'), '/:id/:region/:size/:rotation/default.:format(jpg|png)'
+app.get default_image_path, (req, res) ->
   log.info {route: 'image', url: req.url, ip: req.ip}
   image_response(req, res, info_cache)
 
@@ -140,7 +149,7 @@ app.get '*', (req, res) ->
   url = req.url
   url_parts = url.split('/')
   possible_image_identifier = url_parts[0]
-  possible_image_path = resolve_image_path possible_image_identifier
+  possible_image_path = resolve_source_image_path possible_image_identifier
   fs.stat possible_image_path, (err, stats) ->
     if err
       log.info {res: '400', url: url, ip: req.ip}, '400'

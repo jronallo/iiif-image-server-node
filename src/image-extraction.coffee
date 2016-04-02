@@ -1,9 +1,10 @@
-resolve_image_path = require('./resolver').resolve_image_path
+resolve_source_image_path = require('./resolver').resolve_source_image_path
 _ = require 'lodash'
 tempfile = require 'tempfile'
 fs = require 'fs'
 mkdirp = require 'mkdirp'
 path = require 'path'
+retrieve_cached_info_json = require './retrieve-cached-info-json'
 
 # exported from main
 log = require('./index').log
@@ -17,8 +18,12 @@ iiif = require 'iiif-image'
 Informer = iiif.Informer(jp2_binary)
 Extractor = iiif.Extractor(jp2_binary)
 Validator = iiif.Validator
+InfoJSONCreator = iiif.InfoJSONCreator
 path_for_cache_file = require('./path-for-cache-file')
 too_big = require('./helpers').too_big
+server_info = require './server-info'
+cache_info_json = require './cache-info-json'
+info_json_path = require './info-json-path'
 
 ###
 This function needs the response object and the incoming URL to parse the URL,
@@ -27,7 +32,7 @@ response to the client.
 ###
 image_extraction = (req, res, params) ->
   url = req.url
-  image_path = resolve_image_path(params.identifier)
+  source_image_path = resolve_source_image_path(params.identifier)
 
   # To begin we define some callbacks. extractor_cb and info_cb
 
@@ -64,11 +69,14 @@ image_extraction = (req, res, params) ->
   returned.
   ###
   info_cb = (info) ->
-    # First if the information we get back is not already in the information
-    # cache we add it there.
-    if !info_cache.get(params.identifier)
-      info_cache.set params.identifier, info
-      log.info {cache: 'info', op: 'set', url: url, ip: req.ip}, 'info cached'
+    # cache the info.json in the info cache if it doesn't exist
+    fs.stat info_json_path(req.params.id), (err, stats) ->
+      if err
+        info_json_creator = new InfoJSONCreator info, server_info(req, req.params.id)
+        info_json = info_json_creator.info_json
+        cache_info_json(req, info_json)
+
+    # Now validate that the request is valid for this image
     validator = new Validator params, info
     # Besides checking for validity we also check whether this request
     # falls within the allowable size limits for the returned image.
@@ -76,7 +84,7 @@ image_extraction = (req, res, params) ->
       log.info {valid: true, test: 'info', url: url, ip: req.ip}, 'valid w/ info'
       # We create the options that the Extractor expects
       options =
-        path: image_path
+        path: source_image_path
         params: params # from ImageRequestParser
         info: info # from the Informer
 
@@ -89,11 +97,11 @@ image_extraction = (req, res, params) ->
 
   # If the information for the image is in the cache then we do not run the
   # informer and just skip right to the doing something with the information.
-  cache_info = info_cache.get params.identifier
-  if cache_info
-    info_cb(_.cloneDeep cache_info)
-  else
-    informer = new Informer image_path, info_cb
-    informer.inform()
+  retrieve_cached_info_json params.identifier, (info) ->
+    if info
+      info_cb(info)
+    else
+      informer = new Informer source_image_path, info_cb
+      informer.inform()
 
 module.exports = image_extraction

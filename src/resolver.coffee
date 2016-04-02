@@ -37,7 +37,7 @@ resolve_directory = (id) ->
   else if type == 'pairtree'
     pairtree_file_path_resolver(clean_id)
 
-resolve_image_path = (id) ->
+resolve_source_image_path = (id) ->
   clean_id = sanitize_id(id)
   filename = "#{clean_id}.jp2"
   directory = resolve_directory(clean_id)
@@ -46,5 +46,5 @@ resolve_image_path = (id) ->
 
 
 
-exports.resolve_image_path = resolve_image_path
+exports.resolve_source_image_path = resolve_source_image_path
 exports.resolve_directory = resolve_directory
