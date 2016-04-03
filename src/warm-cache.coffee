@@ -12,13 +12,16 @@ warm_cache = (req, res) ->
     scheme = if req.connection.encrypted? then 'https' else 'http'
     full_url = "#{scheme}://#{full_path}"
     http.get(full_url, (res) ->
-      # TODO: Do something if error
-      console.log full_url
-      callback()
+      if res.statusCode == 200
+        callback()
+      else
+        callback(true)
     ).on 'error', (e) ->
       callback(true)
   async.each profiles, warm_profile, (err) ->
     if err
+      # If there's an error anywhere along the way this is a failure.
+      # TODO: Clean up any files that might have been created.
       res.status(400).send('unable to warm cache')
     else
       res.status(200).send(profiles)

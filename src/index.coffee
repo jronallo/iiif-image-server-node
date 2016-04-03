@@ -111,7 +111,7 @@ if config.get('viewer')
         log.info {res: '404', url: req.url, ip: req.ip}, '404'
         res.status(404).send('404')
       else
-        log.info {res: 'viewer', url: req.url, ip: req.ip}, '400'
+        log.info {res: 'viewer', url: req.url, ip: req.ip}, 'viewer 200'
         index = path.join __dirname, "/../app/index.html"
         res.setHeader('Content-Type', 'text/html')
         res.sendFile(index)
