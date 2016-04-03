@@ -8,9 +8,11 @@ prefix: ''
 # opj => OpenJPEG => opj_dump and opj_decompress
 jp2_binary: 'opj'
 
-# Provide a profile of the IIIF URLs that you want to warm the cache with and
-# keep in the cache for longer than random images. See cache.clean below.
-# The keys are meant for humans and aren't used.
+# Provide a profile of the IIIF URLs that you want to warm the cache with and/or
+# keep in the cache for longer than random images. See cache.clean and
+# cache.warm below. The keys are meant for humans and aren't used.
+# Setting profile to false means that the cache warming route
+# will be inactive.
 profile:
   search_index_page: /square/300,/0/default.jpg
   index_show_view:   /full/600,/0/default.jpg
@@ -50,7 +52,26 @@ cache:
     random_image: 86400000
     # warm: Two different methods can be used to clear the cache
     # when the warm route is requested.
-    # TODO: warm config
+
+  # cache.warm: Settings for an HTTP API for warming the cache for a particular
+  # identifier. For instance when running the application locally you could
+  # GET the url http://localhost:3001/warm/trumpler14 and it will create the
+  # info.json and create the images in the profile above.
+  # If warm is set to anything truthy it will create the cache warming route.
+  # Set warm to false if you want to turn off the cache warming API.
+  # If there are no profile URLs then it will only create the info.json.
+  warm:
+    # You can set whether you want to force the cache for that image to be
+    # cleared before warming it or not. There are two choices for this 'id'
+    # and 'profile'. The 'id' approach will clear out all files for that
+    # identifier including the info.json and profile images regardless of
+    # access time. The 'profile' method will clear out images based on the
+    # cache.clean settings above where profile images persist for longer than
+    # non-profile images. Setting cache.warm.clear_with to false will not
+    # clear the cache before ensuring the info.json and profile images are
+    # created. Since we are just requesting the URL for the info.json or
+    # image if it already exists it will not be overwritten.
+    clear_with: 'profile'
 
 resolver:
   # Source image resolver. If the base_path is falsey then the images directory

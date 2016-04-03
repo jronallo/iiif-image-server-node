@@ -88,8 +88,15 @@ Different keys tell you where in the code the log message comes from:
 
 `res`: What kind of response has been sent. Will either be "info", "image", "viewer", or a status code.
 
+## Caching
+
+### Cache Warming
+If the config includes a cache.warm key set truthy, then the cache warming route is activated. Part of warming the cache can include clearing it beforehand. See config/default.yml for more documentation on how to configure this.
+
+Note: In order to avoid DOS attacks where someone repeatedly requests a cache warming URL that clears the cache, you have two options: 1. Turn off the cache clearing by setting cache.warm.clear_with to false. 2. Only allow access to this path from certain IP addresses. This is best done at the web server level (Apache, Nginx). Though I may add this functionality into the image server at some point.
+
 ## TODO
-- write documentation about cache warming
+- Configure which IP addresses are allowed to access the cache warming URL.
 - Disable memory cache clearing?
 - Ansible deploy scripts should set expires headers via nginx (or node?)
 - Can performance be improved if output of opj_decompress and kdu_expand is streamed through a socket? How would this work? http://stackoverflow.com/questions/11750041/how-to-create-a-named-pipe-in-node-js/18226566#18226566

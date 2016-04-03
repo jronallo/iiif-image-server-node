@@ -116,7 +116,7 @@ if config.get('viewer')
         res.setHeader('Content-Type', 'text/html')
         res.sendFile(index)
 
-if config.get('profile')
+if config.get('cache.warm')
   warm_path = path.join '/', config.get('prefix'), '/warm/:id/?$'
   app.get warm_path, (req, res) ->
     log.info {route: 'warm', url: req.url, ip: req.ip}
