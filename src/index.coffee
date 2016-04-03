@@ -71,7 +71,7 @@ info_json_response = require './info-json-response'
 # TODO: Allow for selecting a custom implementation for image response
 image_response = require './image-response'
 resolve_source_image_path = require('./resolver').resolve_source_image_path
-warm_cache = require('./warm-cache')
+warm_cache = require('./caching/warm-cache')
 
 ###
 Static assets in this case means cached image files when the

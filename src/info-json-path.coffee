@@ -1,5 +1,5 @@
 path = require 'path'
-path_for_cache_file = require('./path-for-cache-file')
+path_for_cache_file = require('./caching/path-for-cache-file')
 
 info_json_path = (id) ->
   info_json_path_part = path.join id, 'info.json'

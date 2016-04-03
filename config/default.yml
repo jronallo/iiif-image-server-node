@@ -48,6 +48,9 @@ cache:
     # this number to as high as you can while not exceeding your storage space.
     # Default is one day.
     random_image: 86400000
+    # warm: Two different methods can be used to clear the cache
+    # when the warm route is requested.
+    # TODO: warm config
 
 resolver:
   # Source image resolver. If the base_path is falsey then the images directory

@@ -9,7 +9,7 @@ caching solution won't work for every image server.
 
 path = require 'path'
 os = require 'os'
-log = require('./index').log
+log = require('../index').log
 config = require 'config'
 resolve_base_cache_path = require './resolve-base-cache-path'
 

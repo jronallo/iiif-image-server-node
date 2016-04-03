@@ -11,9 +11,9 @@ Informer = iiif.Informer(jp2_binary)
 
 info_cache = require('./index').info_cache
 resolve_source_image_path = require('./resolver').resolve_source_image_path
-retrieve_cached_info_json = require './retrieve-cached-info-json'
+retrieve_cached_info_json = require './caching/retrieve-cached-info-json'
 server_info = require './server-info'
-cache_info_json = require './cache-info-json'
+cache_info_json = require './caching/cache-info-json'
 
 info_json_response = (req, res) ->
   ###

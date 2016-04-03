@@ -3,7 +3,7 @@ path = require 'path'
 mkdirp = require 'mkdirp'
 _ = require 'lodash'
 path_for_cache_file = require('./path-for-cache-file')
-log = require('./index').log
+log = require('../index').log
 config = require 'config'
 
 cache_info_json = (req, info_json) ->

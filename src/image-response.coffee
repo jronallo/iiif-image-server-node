@@ -16,7 +16,7 @@ too_big = require('./helpers').too_big
 
 # Helpers
 resolve_source_image_path = require('./resolver').resolve_source_image_path
-path_for_cache_file = require('./path-for-cache-file')
+path_for_cache_file = require('./caching/path-for-cache-file')
 # TODO: Allow for selecting a custom implementation of image_extraction
 image_extraction = require('./image-extraction')
 

@@ -4,7 +4,7 @@ tempfile = require 'tempfile'
 fs = require 'fs'
 mkdirp = require 'mkdirp'
 path = require 'path'
-retrieve_cached_info_json = require './retrieve-cached-info-json'
+retrieve_cached_info_json = require './caching/retrieve-cached-info-json'
 
 # exported from main
 log = require('./index').log
@@ -19,10 +19,10 @@ Informer = iiif.Informer(jp2_binary)
 Extractor = iiif.Extractor(jp2_binary)
 Validator = iiif.Validator
 InfoJSONCreator = iiif.InfoJSONCreator
-path_for_cache_file = require('./path-for-cache-file')
+path_for_cache_file = require('./caching/path-for-cache-file')
 too_big = require('./helpers').too_big
 server_info = require './server-info'
-cache_info_json = require './cache-info-json'
+cache_info_json = require './caching/cache-info-json'
 info_json_path = require './info-json-path'
 
 ###
@@ -90,7 +90,7 @@ image_extraction = (req, res, params) ->
           info_json_creator = new InfoJSONCreator info, server_info(req, req.params.id)
           info_json = info_json_creator.info_json
           cache_info_json(req, info_json)
-          
+
     else # not valid!
       log.info {valid: false, test: 'info', url: url, ip: req.ip}, 'invalid w/ info'
       log.info {res: '400', url: url, ip: req.ip}, '400'

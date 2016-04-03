@@ -1,7 +1,7 @@
 fs = require 'fs'
-info_cache = require('./index').info_cache
-info_json_path = require './info-json-path'
-log = require('./index').log
+info_cache = require('../index').info_cache
+info_json_path = require '../info-json-path'
+log = require('../index').log
 
 retrieve_cached_info_json = (id, callback) ->
   if info_cache.get id

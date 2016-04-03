@@ -7,7 +7,7 @@ resolve_base_cache_path = ->
   base_path = if base_path == 'tmpdir'
     os.tmpdir()
   else if base_path == 'public'
-    path.join __dirname, '/../public'
+    path.join __dirname, '/../../public'
   else
     base_path
 
