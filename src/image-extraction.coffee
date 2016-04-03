@@ -69,13 +69,6 @@ image_extraction = (req, res, params) ->
   returned.
   ###
   info_cb = (info) ->
-    # cache the info.json in the info cache if it doesn't exist
-    fs.stat info_json_path(req.params.id), (err, stats) ->
-      if err
-        info_json_creator = new InfoJSONCreator info, server_info(req, req.params.id)
-        info_json = info_json_creator.info_json
-        cache_info_json(req, info_json)
-
     # Now validate that the request is valid for this image
     validator = new Validator params, info
     # Besides checking for validity we also check whether this request
@@ -90,6 +83,14 @@ image_extraction = (req, res, params) ->
 
       extractor = new Extractor options, extractor_cb
       extractor.extract()
+
+      # cache the info.json in the info cache if it doesn't exist
+      fs.stat info_json_path(req.params.id), (err, stats) ->
+        if err
+          info_json_creator = new InfoJSONCreator info, server_info(req, req.params.id)
+          info_json = info_json_creator.info_json
+          cache_info_json(req, info_json)
+          
     else # not valid!
       log.info {valid: false, test: 'info', url: url, ip: req.ip}, 'invalid w/ info'
       log.info {res: '400', url: url, ip: req.ip}, '400'
