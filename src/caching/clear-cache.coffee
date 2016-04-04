@@ -6,7 +6,22 @@ async = require 'async'
 require 'shelljs/global' # for find
 config = require 'config'
 resolve_base_cache_path = require './resolve-base-cache-path'
-log = require('../index').log
+# set up log file
+bunyan = require 'bunyan'
+log_file_path = path.join __dirname, "../../log/clean_iiif_cache-#{process.env.NODE_ENV}.log"
+log = bunyan.createLogger {
+  name: 'clean_iiif_cache'
+  streams: [
+    {
+      level: 'debug',
+      stream: process.stdout
+    },
+    {
+      level: 'debug'
+      path: log_file_path
+    }
+  ]
+}
 
 # Setup used by clear_cache_from_profile
 # Load the profile and create a regex that can be used to match the profile.
@@ -32,7 +47,7 @@ clear_cache_from_profile = (id, profile_callback) ->
   base_path_for_id = path.join resolve_base_cache_path(), id
   fs.stat base_path_for_id, (err, stats) ->
     if err
-      profile_callback()
+      profile_callback() if profile_callback?
     else
       image_files = find(base_path_for_id)
         .filter (file) ->
@@ -70,7 +85,7 @@ clear_cache_from_profile = (id, profile_callback) ->
 
       # iterate through all the image_files
       async.each image_files, process_image, (err) ->
-        profile_callback(id)
+        profile_callback(id) if profile_callback?
 
 exports.clear_cache_for_id = clear_cache_for_id
 exports.clear_cache_from_profile = clear_cache_from_profile

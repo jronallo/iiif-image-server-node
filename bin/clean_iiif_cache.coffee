@@ -10,23 +10,7 @@ fs = require 'fs'
 yaml = require 'js-yaml'
 _ = require 'lodash'
 path = require 'path'
-bunyan = require 'bunyan'
-
-log_file_path = path.join __dirname, "../log/clean_iiif_cache-#{process.env.NODE_ENV}.log"
-log = bunyan.createLogger {
-  name: 'clean_iiif_cache'
-  streams: [
-    {
-      level: 'debug',
-      stream: process.stdout
-    },
-    {
-      level: 'debug'
-      path: log_file_path
-    }
-  ]
-}
-
+glob = require 'glob'
 
 # loads configuration file
 config = require 'config'
@@ -34,6 +18,7 @@ config = require 'config'
 
 # We need to know the base path used for caching to know where to look for images.
 resolve_base_cache_path = require '../lib/caching/resolve-base-cache-path'
+clear_cache_from_profile = require('../lib/caching/clear-cache').clear_cache_from_profile
 
 program = require 'commander'
 program
@@ -52,6 +37,9 @@ if !config.get('profile')
   program.outputHelp()
   process.exit()
 
-# TODO: NOT YET IMPLEMENTED
-# Find the base path with all the identifier names and for each one call
-# the clear_cache_from_profile function with that identifier.
+search_path = path.join resolve_base_cache_path(), config.get('prefix'), '*'
+identifier_paths = glob.sync search_path, {realpath: true}
+
+for identifier_path in identifier_paths
+  identifier = identifier_path.split(path.sep).pop()
+  clear_cache_from_profile(identifier)
