@@ -10,6 +10,7 @@ test 'cache warming works', (assert) ->
     .end (err, res) ->
       # File caching happens _after_ the response is sent so we need to delay
       # before checking on the presence of the files.
+      # TODO: Maybe there is a better way to wait for this to complete?
       delay 100, ->
         # Check that the body returned is correct
         res_json = res.body
