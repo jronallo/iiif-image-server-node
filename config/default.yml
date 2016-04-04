@@ -71,7 +71,7 @@ cache:
     # clear the cache before ensuring the info.json and profile images are
     # created. Since we are just requesting the URL for the info.json or
     # image if it already exists it will not be overwritten.
-    clear_with: 'profile'
+    clear_with: 'id'
 
 resolver:
   # Source image resolver. If the base_path is falsey then the images directory

@@ -10,10 +10,13 @@ cleanup = ->
     if err
       console.log err
 
+delay = (ms, func) -> setTimeout func, ms
+
 helpers =
   request: require 'supertest'
   app: require('../src/index').app
   test: require 'tape'
   cleanup: cleanup
+  delay: delay
 
 module.exports = helpers
