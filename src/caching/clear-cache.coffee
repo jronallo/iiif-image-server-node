@@ -34,7 +34,8 @@ time_difference_random_image = config.get('cache.clean.random_image')
 
 # Completely clear the cache for this identifier.
 clear_cache_for_id = (id, callback) ->
-  base_path_for_id = path.join resolve_base_cache_path(), id
+  base_path_for_id = path.join resolve_base_cache_path(), config.get('prefix'), id
+  console.log base_path_for_id
   rimraf base_path_for_id, (err) ->
     callback(id) if callback?
 
@@ -44,7 +45,7 @@ clear_cache_from_profile = (id, profile_callback) ->
   now = new Date()
   log.info "DATE: #{now}"
 
-  base_path_for_id = path.join resolve_base_cache_path(), id
+  base_path_for_id = path.join resolve_base_cache_path(), config.get('prefix'), id
   fs.stat base_path_for_id, (err, stats) ->
     if err
       profile_callback() if profile_callback?
