@@ -37,7 +37,7 @@
     "bunyan": "^1.6.0",
     "config": "^1.19.0",
     "express": "^4.13.4",
-    "iiif-image": "0.0.21",
+    "iiif-image": "0.0.22",
     "js-yaml": "^3.5.3",
     "lodash": "^4.3.0",
     "mkdirp": "^0.5.1",
