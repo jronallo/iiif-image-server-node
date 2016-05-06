@@ -12,8 +12,10 @@
     passenger_startup_file: lib/index.js
 
   roles:
+    - role: dev-dummy-cert
     - role: passenger-nginx-install
     - role: passenger-nginx-config
+    # - role: jp2
     - role: image-server
 
   post_tasks:

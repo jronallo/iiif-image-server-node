@@ -9,7 +9,9 @@ Vagrant.configure(2) do |config|
 
   config.vm.network "forwarded_port", guest: 80, host: 8088,
     auto_correct: true
-  config.vm.network "forwarded_port", guest: 3000, host: 3000,
+  config.vm.network "forwarded_port", guest: 443, host: 8443,
+      auto_correct: true
+  config.vm.network "forwarded_port", guest: 3001, host: 8090,
     auto_correct: true
   config.vm.network "private_network", ip: "192.168.33.15"
 
@@ -21,6 +23,7 @@ Vagrant.configure(2) do |config|
     ansible.playbook = 'ansible/development-playbook.yml'
     ansible.inventory_path = 'ansible/inventories/development.ini'
     ansible.limit = 'all'
+    # ansible.verbose = 'vvvv'
   end
 
   config.ssh.forward_agent = true
