@@ -1,6 +1,6 @@
 {
   "name": "iiif-image-server-node",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "An example image server using the iiif-image module",
   "main": "lib/index.js",
   "bin": {
