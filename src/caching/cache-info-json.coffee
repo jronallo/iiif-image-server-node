@@ -20,7 +20,7 @@ cache_info_json = (req, info_json) ->
       info_json_file = JSON.stringify info_json
       fs.writeFile info_json_cache_path, info_json_file, (err) ->
         if !err
-          log.info {cache: 'info.json', op: 'write', url: req.url, ip: req.ip}, 'info.json cached'
+          log.info {cache: 'info.json', op: 'write', url: req.path, ip: req.ip}, 'info.json cached'
         else
           console.log err
 

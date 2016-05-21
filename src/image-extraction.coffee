@@ -31,7 +31,7 @@ get information about the image, extract the requested image, and provide a
 response to the client.
 ###
 image_extraction = (req, res, params) ->
-  url = req.url
+  url = req.path
   source_image_path = resolve_source_image_path(params.identifier)
 
   # To begin we define some callbacks. extractor_cb and info_cb

@@ -23,7 +23,7 @@ info_json_response = (req, res) ->
   resolve_source_image_path is not robust enough to defend against a directory
   traversal attack.
   ###
-  url = req.url
+  url = req.path
   url_parts = url.split('/')
   id = url_parts[url_parts.length - 2]
   source_image_path = resolve_source_image_path(id)
@@ -65,10 +65,10 @@ info_json_response = (req, res) ->
       # not have to inspect the image again.
       retrieve_cached_info_json id, (info) ->
         if info
-          log.info {cache: 'info', found: 'hit', url: req.url, ip: req.ip}
+          log.info {cache: 'info', found: 'hit', url: url, ip: req.ip}
           res.send info
         else
-          log.info {cache: 'info', found: 'miss', url: req.url, ip: req.ip}
+          log.info {cache: 'info', found: 'miss', url: url, ip: req.ip}
           informer = new Informer source_image_path, info_cb
           informer.inform()
 

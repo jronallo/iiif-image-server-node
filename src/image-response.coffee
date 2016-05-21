@@ -23,7 +23,11 @@ image_extraction = require('./image-extraction')
 ttl = config.get('cache.image.ttl')
 
 image_response = (req, res) ->
-  url = req.url
+  ###
+  In case there are query parameters we do not use #url for the full URL but
+  instead use the Express method to get the path of the request only.
+  ###
+  url = req.path
   ###
   If the image exists just serve that up. This allows cached images
   to be used across instances of the application.

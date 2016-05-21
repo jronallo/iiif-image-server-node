@@ -104,14 +104,14 @@ if config.get('viewer')
   # http://localhost:3000/index.html?id=trumpler14
   viewer_path = path.join '/', config.get('prefix'), '/viewer/:id/?$'
   app.get viewer_path, (req, res) ->
-    log.info {route: 'viewer', url: req.url, ip: req.ip}
+    log.info {route: 'viewer', url: req.path, ip: req.ip}
     source_image_path = resolve_source_image_path(req.params.id)
     fs.stat source_image_path, (err, stats) ->
       if err
-        log.info {res: '404', url: req.url, ip: req.ip}, '404'
+        log.info {res: '404', url: req.path, ip: req.ip}, '404'
         res.status(404).send('404')
       else
-        log.info {res: 'viewer', url: req.url, ip: req.ip}, 'viewer 200'
+        log.info {res: 'viewer', url: req.path, ip: req.ip}, 'viewer 200'
         index = path.join __dirname, "/../app/index.html"
         res.setHeader('Content-Type', 'text/html')
         res.sendFile(index)
@@ -119,13 +119,13 @@ if config.get('viewer')
 if config.get('cache.warm')
   warm_path = path.join '/', config.get('prefix'), '/warm/:id/?$'
   app.get warm_path, (req, res) ->
-    log.info {route: 'warm', url: req.url, ip: req.ip}
+    log.info {route: 'warm', url: req.path, ip: req.ip}
     warm_cache(req, res)
 
 # Respond to a IIIF Image Information Request with JSON
 info_json_path = path.join '/', config.get('prefix'), '/:id/info.json'
 app.get info_json_path, (req, res) ->
-  log.info {route: 'info.json', url: req.url, ip: req.ip}
+  log.info {route: 'info.json', url: req.path, ip: req.ip}
   # Set CORS header
   if config.get 'cors'
     res.header "Access-Control-Allow-Origin", config.get('cors')
@@ -135,7 +135,7 @@ app.get info_json_path, (req, res) ->
 # This image server will only accept requests for jpg and png images.
 default_image_path = path.join '/', config.get('prefix'), '/:id/:region/:size/:rotation/default.:format(jpg|png)'
 app.get default_image_path, (req, res) ->
-  log.info {route: 'image', url: req.url, ip: req.ip}
+  log.info {route: 'image', url: req.path, ip: req.ip}
   image_response(req, res, info_cache)
 
 # Catch all other requests. In some cases this will be a
@@ -146,7 +146,7 @@ app.get '*', (req, res) ->
   # If the first part of the path is an identifier and there
   # are no other path segements then we redirect to the
   # info.json response.
-  url = req.url
+  url = req.path
   url_parts = url.split('/')
   possible_image_identifier = url_parts[0]
   possible_image_path = resolve_source_image_path possible_image_identifier
