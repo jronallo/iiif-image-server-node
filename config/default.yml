@@ -6,7 +6,7 @@ prefix: ''
 # These binaries must be in the PATH of the user who runs the image server.
 # kdu => Kakadu => kdu_jp2info and kdu_expand
 # opj => OpenJPEG => opj_dump and opj_decompress
-jp2_binary: 'opj'
+jp2_binary: 'kdu'
 
 # Provide a profile of the IIIF URLs that you want to warm the cache with and/or
 # keep in the cache for longer than random images. See cache.clean and

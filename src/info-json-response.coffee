@@ -44,6 +44,7 @@ info_json_response = (req, res) ->
         info_json_creator = new InfoJSONCreator info, server_info(req, id)
         log.info {res: 'info', url: url, ip: req.ip}, 'response info.json'
         info_json = info_json_creator.info_json
+        info_json.profile.push {formats: ['jpg']}
         # Now immediately send the response
         res.send info_json
 
